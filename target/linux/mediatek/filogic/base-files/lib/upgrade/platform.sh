@@ -90,6 +90,7 @@ platform_do_upgrade() {
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubootmod|\
 	cudy,tr3000-v1-ubootmod|\
 	gatonetworks,gdsp|\
 	h3c,magic-nx30-pro|\
@@ -274,6 +275,7 @@ platform_check_image() {
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubootmod|\
 	cudy,tr3000-v1-ubootmod|\
 	gatonetworks,gdsp|\
 	h3c,magic-nx30-pro|\
