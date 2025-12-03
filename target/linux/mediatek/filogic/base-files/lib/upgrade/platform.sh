@@ -160,7 +160,6 @@ platform_do_upgrade() {
 	cudy,wr3000-v1|\
 	totolink,x6000r|\
 	wavlink,wl-wn573hx3|\
-	wavlink,wl-wn586x3|\
 	widelantech,wap430x|\
 	yuncore,ax835)
 		default_do_upgrade "$1"
