@@ -6,10 +6,10 @@
 / {
 	aliases {
 		serial0 = &uart0;
-		led-boot = &led_blue;
-		led-failsafe = &led_blue;
-		led-running = &led_green;
-		led-upgrade = &led_red;
+		led-boot = &led-3;
+		led-failsafe = &led-3;
+		led-running = &led-2;
+		led-upgrade = &led-0;
 	};
 
 	chosen: chosen {
