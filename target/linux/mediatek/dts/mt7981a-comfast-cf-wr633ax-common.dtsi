@@ -40,29 +40,29 @@
 	leds {
 		compatible = "gpio-leds";
 
-		led_blue: blue {
-			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
-			color = <LED_COLOR_ID_BLUE>;
-			function = LED_FUNCTION_STATUS;
-		};
-
-		led_red: red {
+		led-0: red {
 			gpios = <&pio 8 GPIO_ACTIVE_LOW>;
 			color = <LED_COLOR_ID_RED>;
 			function = LED_FUNCTION_STATUS;
 		};
 
-		led_green: green {
+		led-1: wan {
+            gpios = <&pio 13 GPIO_ACTIVE_LOW>;
+			color = <LED_COLOR_ID_YELLOW>;
+			function = LED_FUNCTION_STATUS;
+        };
+
+		led-2: green {
 			gpios = <&pio 34 GPIO_ACTIVE_LOW>;
 			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_STATUS;
 		};
 
-		led_wan: wan {
-            gpios = <&pio 13 GPIO_ACTIVE_LOW>;
-			color = <LED_COLOR_ID_YELLOW>;
+		led-3: blue {
+			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
+			color = <LED_COLOR_ID_BLUE>;
 			function = LED_FUNCTION_STATUS;
-        };
+		};
 	};
 };
 
@@ -70,7 +70,7 @@
 	status = "okay";
 
 	gmac0: mac@0 {
-		/* LAN */
+		label = "lan";
 		compatible = "mediatek,eth-mac";
 		reg = <0>;
 		phy-mode = "2500base-x";
@@ -85,7 +85,7 @@
 	};
 
 	gmac1: mac@1 {
-		/* WAN */
+		label = "wan";
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
 		phy-mode = "gmii";
