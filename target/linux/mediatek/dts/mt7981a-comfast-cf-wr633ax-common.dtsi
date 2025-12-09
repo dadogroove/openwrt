@@ -6,10 +6,10 @@
 / {
 	aliases {
 		serial0 = &uart0;
-		led-boot = &led-3;
-		led-failsafe = &led-3;
-		led-running = &led-2;
-		led-upgrade = &led-0;
+		led-boot = &led_blue;
+		led-failsafe = &led_blue;
+		led-running = &led_green;
+		led-upgrade = &led_red;
 	};
 
 	chosen: chosen {
@@ -40,25 +40,25 @@
 	leds {
 		compatible = "gpio-leds";
 
-		led-0: red {
+		led_red: red {
 			gpios = <&pio 8 GPIO_ACTIVE_LOW>;
 			color = <LED_COLOR_ID_RED>;
 			function = LED_FUNCTION_STATUS;
 		};
 
-		led-1: wan {
+		led_wan: wan {
             gpios = <&pio 13 GPIO_ACTIVE_LOW>;
 			color = <LED_COLOR_ID_YELLOW>;
 			function = LED_FUNCTION_STATUS;
         };
 
-		led-2: green {
+		led_green: green {
 			gpios = <&pio 34 GPIO_ACTIVE_LOW>;
 			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_STATUS;
 		};
 
-		led-3: blue {
+		led_blue: blue {
 			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
 			color = <LED_COLOR_ID_BLUE>;
 			function = LED_FUNCTION_STATUS;
