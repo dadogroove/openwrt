@@ -107,6 +107,7 @@ mediatek_setup_interfaces()
 	cudy,ap3000outdoor-v1|\
 	cudy,ap3000-v1|\
 	cudy,re3000-v1|\
+	kebidumei,ax3000-u22|\
 	netgear,eax17|\
 	netgear,wax220|\
 	openfi,6c|\
@@ -140,6 +141,10 @@ mediatek_setup_interfaces()
 	smartrg,sdg-8733a|\
 	yuncore,ax835)
 		ucidef_set_interfaces_lan_wan lan wan
+		;;
+	keenetic,kn-1812|\
+	netcraze,nc-1812)
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4 lan5" "wan"
 		;;
 	mediatek,mt7986a-rfb)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4 lan6" "eth1 wan"
