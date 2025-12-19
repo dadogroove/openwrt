@@ -26,7 +26,7 @@
 	gpio-keys {
 		compatible = "gpio-keys";
 
-		button-reset {
+		button-0 {
 			label = "reset";
 			linux,code = <KEY_RESTART>;
 			gpios = <&pio 11 GPIO_ACTIVE_LOW>;
