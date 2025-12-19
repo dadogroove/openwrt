@@ -90,6 +90,7 @@ platform_do_upgrade() {
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubootmod|\
 	cudy,tr3000-v1-ubootmod|\
 	gatonetworks,gdsp|\
 	h3c,magic-nx30-pro|\
@@ -161,6 +162,7 @@ platform_do_upgrade() {
 	kebidumei,ax3000-u22|\
 	totolink,x6000r|\
 	wavlink,wl-wn573hx3|\
+	wavlink,wl-wn586x3|\
 	widelantech,wap430x|\
 	yuncore,ax835)
 		default_do_upgrade "$1"
@@ -276,6 +278,7 @@ platform_check_image() {
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubootmod|\
 	cudy,tr3000-v1-ubootmod|\
 	gatonetworks,gdsp|\
 	h3c,magic-nx30-pro|\
