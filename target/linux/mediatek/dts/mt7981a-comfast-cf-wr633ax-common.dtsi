@@ -28,9 +28,10 @@
 		compatible = "gpio-keys";
 
 		button-0 {
-			label = "vendor";
-			linux,code = <KEY_VENDOR>;
+			label = "mesh";
 			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
+			linux,code = <BTN_9>;
+			linux,input-type = <EV_SW>;
 		};
 
 		button-1 {
