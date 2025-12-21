@@ -42,7 +42,7 @@
 		};
 	};
 
-	leds: leds {
+	leds {
 		compatible = "gpio-leds";
 
 		led_status_blue: led-status-blue {
