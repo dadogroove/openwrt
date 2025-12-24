@@ -6,6 +6,11 @@
 / {
 	model = "Linksys SPNMX56";
 	compatible = "linksys,spnmx56", "qcom,ipq5018";
+
+	chosen {
+		bootargs-append = " root=/dev/ubiblock0_0 coherent_pool=2M";
+		stdout-path = "serial0:115200n8";
+	};
 };
 
 /*
@@ -179,8 +184,7 @@
 };
 
 &q6v5_wcss {
-	firmware-name = "ath11k/IPQ5018/hw1.0/q6_fw.mdt",
-			"ath11k/IPQ5018/hw1.0/m3_fw.mdt";
+	firmware-name = "ath11k/IPQ5018/hw1.0/q6_fw.mdt";
 };
 
 &wifi {
