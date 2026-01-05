@@ -79,7 +79,9 @@ case "$board" in
 		addr=$(cat /sys/class/net/eth0/address)
 		[ "$PHYNBR" = "1" ] && macaddr_add $addr -1 > /sys${DEVPATH}/macaddress
 		;;
-	comfast,cf-e393ax)
+	comfast,cf-e393ax|\
+	comfast,cf-wr633ax|\
+	comfast,cf-wr633ax-ubootmod)
 		addr=$(mtd_get_mac_binary "Factory" 0x8000)
 		[ "$PHYNBR" = "1" ] && macaddr_add $addr 1 > /sys${DEVPATH}/macaddress
 		;;
@@ -223,7 +225,8 @@ case "$board" in
 		addr=$(mtd_get_mac_binary "Factory" 0x4)
 		[ "$PHYNBR" = "1" ] && macaddr_add $addr 1 > /sys${DEVPATH}/macaddress
 		;;
-	wavlink,wl-wn573hx3)
+	wavlink,wl-wn573hx3|\
+	wavlink,wl-wn586x3)
 		addr=$(mtd_get_mac_binary factory 0x04)
 		[ "$PHYNBR" = "1" ] && macaddr_setbit_la $(macaddr_add $addr -0x300000) > /sys${DEVPATH}/macaddress
 		;;
