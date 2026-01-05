@@ -1,0 +1,69 @@
+# Use "make defconfig" to expand this to a full .config
+CONFIG_TARGET_x86=y
+CONFIG_TARGET_x86_64=y
+CONFIG_TARGET_x86_64_DEVICE_generic=y
+CONFIG_TARGET_PER_DEVICE_ROOTFS=y
+
+CONFIG_TARGET_KERNEL_PARTSIZE=16
+CONFIG_TARGET_ROOTFS_PARTSIZE=256
+
+# Wyse needs
+CONFIG_PACKAGE_etherwake=y
+CONFIG_PACKAGE_hdparm=y
+CONFIG_PACKAGE_intel-microcode=y
+CONFIG_PACKAGE_kmod-itco-wdt=y
+CONFIG_PACKAGE_lm-sensors=y
+CONFIG_PACKAGE_rng-tools=y
+CONFIG_PACKAGE_smartmontools=y
+CONFIG_PACKAGE_smartmontools-drivedb=y
+
+# Wyse not needed
+# CONFIG_PACKAGE_bnx2-firmware is not set
+# CONFIG_PACKAGE_kmod-amazon-ena is not set
+# CONFIG_PACKAGE_kmod-amd-xgbe is not set
+# CONFIG_PACKAGE_kmod-bnx2 is not set
+# CONFIG_PACKAGE_kmod-e1000 is not set
+# CONFIG_PACKAGE_kmod-forcedeth is not set
+# CONFIG_PACKAGE_kmod-ixgbe is not set
+# CONFIG_PACKAGE_kmod-igc is not set
+# CONFIG_PACKAGE_kmod-tg3 is not set
+
+# Add-on programs
+CONFIG_PACKAGE_cfdisk=y
+CONFIG_PACKAGE_htop=y
+CONFIG_PACKAGE_irqbalance=y
+CONFIG_PACKAGE_kmod-dnsresolver=y
+CONFIG_PACKAGE_kmod-macvlan=y
+CONFIG_PACKAGE_openssh-sftp-server=y
+CONFIG_PACKAGE_usbutils=y
+CONFIG_PACKAGE_wsdd2=y
+
+# USB device mount & file systems support
+CONFIG_PACKAGE_block-mount=y
+CONFIG_PACKAGE_dosfstools=y
+CONFIG_PACKAGE_e2fsprogs=y
+CONFIG_PACKAGE_f2fs-tools=y
+CONFIG_PACKAGE_kmod-fs-ext4=y
+CONFIG_PACKAGE_kmod-fs-f2fs=y
+CONFIG_PACKAGE_kmod-fs-vfat=y
+CONFIG_PACKAGE_kmod-usb2=y
+CONFIG_PACKAGE_kmod-usb3=y
+CONFIG_PACKAGE_kmod-usb-storage=y
+CONFIG_PACKAGE_kmod-usb-storage-uas=y
+
+# IPv6 NAT support (ip6tables NAT extensions, ipt-nat6 and nf-nat6 kmods)
+CONFIG_PACKAGE_ip6tables-mod-nat=y
+CONFIG_PACKAGE_ip6tables-nft=y
+
+# Luci
+CONFIG_PACKAGE_luci=y
+CONFIG_PACKAGE_luci-app-bcp38=y
+CONFIG_PACKAGE_luci-app-irqbalance=y
+CONFIG_PACKAGE_luci-app-minidlna=y
+CONFIG_PACKAGE_luci-app-samba4=y
+CONFIG_PACKAGE_luci-app-sqm=y
+
+# Luci statistics
+CONFIG_PACKAGE_luci-app-statistics=y
+CONFIG_PACKAGE_collectd-mod-cpufreq=y
+CONFIG_PACKAGE_collectd-mod-thermal=y

@@ -1,0 +1,20 @@
+# Use "make defconfig" to expand this to a full .config
+CONFIG_TARGET_realtek=y
+CONFIG_TARGET_realtek_rtl838x=y
+CONFIG_TARGET_MULTI_PROFILE=y
+CONFIG_TARGET_DEVICE_realtek_rtl838x_DEVICE_netgear_gs108t-v3=y
+CONFIG_TARGET_DEVICE_PACKAGES_realtek_rtl838x_DEVICE_netgear_gs108t-v3=""
+CONFIG_TARGET_DEVICE_realtek_rtl838x_DEVICE_netgear_gs308t-v1=y
+CONFIG_TARGET_DEVICE_PACKAGES_realtek_rtl838x_DEVICE_netgear_gs308t-v1=""
+CONFIG_TARGET_PER_DEVICE_ROOTFS=y
+
+# Add-on programs
+CONFIG_PACKAGE_openssh-sftp-server=y
+
+# Luci
+CONFIG_PACKAGE_luci=y
+
+# Luci statistics
+CONFIG_PACKAGE_luci-app-statistics=y
+CONFIG_PACKAGE_collectd-mod-thermal=y
+
