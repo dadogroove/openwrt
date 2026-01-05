@@ -19,6 +19,8 @@ mediatek_setup_interfaces()
 	nokia,ea0326gmp|\
 	mercusys,mr80x-v3|\
 	routerich,ax3000-v1|\
+	xiaomi,mi-router-ax3000t|\
+	xiaomi,mi-router-ax3000t-ubootmod|\
 	zbtlink,zbt-z8103ax|\
 	zbtlink,zbt-z8103ax-c)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" eth1
@@ -62,6 +64,8 @@ mediatek_setup_interfaces()
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" wan
 		;;
 	asus,tuf-ax4200|\
+	comfast,cf-wr633ax|\
+	comfast,cf-wr633ax-ubootmod|\
 	iptime,ax3000sm|\
 	iptime,ax7800m-6e|\
 	jdcloud,re-cp-03|\
@@ -188,8 +192,6 @@ mediatek_setup_interfaces()
 	tplink,re6000xd)
 		ucidef_set_interface_lan "lan1 lan2 eth1"
 		;;
-	xiaomi,mi-router-ax3000t|\
-	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,mi-router-wr30u-stock|\
 	xiaomi,mi-router-wr30u-ubootmod|\
 	xiaomi,redmi-router-ax6000-stock|\
