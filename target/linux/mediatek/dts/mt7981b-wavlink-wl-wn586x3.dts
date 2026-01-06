@@ -119,8 +119,6 @@
 };
 
 &spi0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&spi0_flash_pins>;
 	status = "disabled";
 };
 
@@ -133,10 +131,8 @@
 		compatible = "jedec,spi-nor";
 		reg = <0>;
 
-		spi-max-frequency = <52000000>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
-
+		spi-max-frequency = <50000000>;
+		
 		partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
