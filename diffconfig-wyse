@@ -32,7 +32,6 @@ CONFIG_PACKAGE_smartmontools-drivedb=y
 CONFIG_PACKAGE_cfdisk=y
 CONFIG_PACKAGE_htop=y
 CONFIG_PACKAGE_irqbalance=y
-CONFIG_PACKAGE_kmod-dnsresolver=y
 CONFIG_PACKAGE_kmod-macvlan=y
 CONFIG_PACKAGE_openssh-sftp-server=y
 CONFIG_PACKAGE_usbutils=y
@@ -50,10 +49,6 @@ CONFIG_PACKAGE_kmod-usb2=y
 CONFIG_PACKAGE_kmod-usb3=y
 CONFIG_PACKAGE_kmod-usb-storage=y
 CONFIG_PACKAGE_kmod-usb-storage-uas=y
-
-# IPv6 NAT support (ip6tables NAT extensions, ipt-nat6 and nf-nat6 kmods)
-CONFIG_PACKAGE_ip6tables-mod-nat=y
-CONFIG_PACKAGE_ip6tables-nft=y
 
 # Luci
 CONFIG_PACKAGE_luci=y
