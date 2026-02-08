@@ -188,9 +188,6 @@ int rtl83xx_lag_del(struct dsa_switch *ds, int group, int port);
  * collect them in this section.
  */
 
-void rtl838x_egress_rate_queue_limit(struct rtl838x_switch_priv *priv, int port,
-				     int queue, u32 rate);
-
 void rtl839x_pie_rule_dump(struct  pie_rule *pr);
 void rtl839x_set_egress_queue(int port, int queue);
 
@@ -202,10 +199,10 @@ void rtl931x_print_matrix(void);
 extern const struct dsa_switch_ops rtldsa_83xx_switch_ops;
 extern const struct dsa_switch_ops rtldsa_93xx_switch_ops;
 
-extern const struct rtl838x_reg rtl838x_reg;
-extern const struct rtl838x_reg rtl839x_reg;
-extern const struct rtl838x_reg rtl930x_reg;
-extern const struct rtl838x_reg rtl931x_reg;
+extern const struct rtldsa_config rtldsa_838x_cfg;
+extern const struct rtldsa_config rtldsa_839x_cfg;
+extern const struct rtldsa_config rtldsa_930x_cfg;
+extern const struct rtldsa_config rtldsa_931x_cfg;
 
 /* TODO actually from arch/mips/rtl838x/prom.c */
 extern struct rtl83xx_soc_info soc_info;
