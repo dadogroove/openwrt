@@ -28,47 +28,47 @@
 
 #define RTMDIO_PHY_POLL_MMD(dev, reg, bit)	((bit << 21) | (dev << 16) | reg)
 
-/* MDIO bus registers */
+/* MDIO bus registers/fields */
 #define RTMDIO_RUN				BIT(0)
 
-#define RTMDIO_838X_CMD_FAIL			0
-#define RTMDIO_838X_CMD_READ_C22		0
-#define RTMDIO_838X_CMD_READ_C45		BIT(1)
-#define RTMDIO_838X_CMD_WRITE_C22		BIT(2)
-#define RTMDIO_838X_CMD_WRITE_C45		BIT(1) | BIT(2)
-#define RTMDIO_838X_CMD_MASK			GENMASK(2, 0)
 #define RTMDIO_838X_PHY_PATCH_DONE		BIT(15)
 #define RTMDIO_838X_SMI_GLB_CTRL		(0xa100)
 #define RTMDIO_838X_SMI_ACCESS_PHY_CTRL_0	(0xa1b8)
 #define RTMDIO_838X_SMI_ACCESS_PHY_CTRL_1	(0xa1bc)
+#define   RTMDIO_838X_CMD_FAIL			0
+#define   RTMDIO_838X_CMD_READ_C22		0
+#define   RTMDIO_838X_CMD_READ_C45		BIT(1)
+#define   RTMDIO_838X_CMD_WRITE_C22		BIT(2)
+#define   RTMDIO_838X_CMD_WRITE_C45		BIT(1) | BIT(2)
+#define   RTMDIO_838X_CMD_MASK			GENMASK(2, 0)
 #define RTMDIO_838X_SMI_ACCESS_PHY_CTRL_2	(0xa1c0)
 #define RTMDIO_838X_SMI_ACCESS_PHY_CTRL_3	(0xa1c4)
 #define RTMDIO_838X_SMI_POLL_CTRL		(0xa17c)
 #define RTMDIO_838X_SMI_PORT0_5_ADDR_CTRL	(0xa1c8)
 
-#define RTMDIO_839X_CMD_FAIL			BIT(1)
-#define RTMDIO_839X_CMD_READ_C22		0
-#define RTMDIO_839X_CMD_READ_C45		BIT(2)
-#define RTMDIO_839X_CMD_WRITE_C22		BIT(3)
-#define RTMDIO_839X_CMD_WRITE_C45		BIT(2) | BIT(3)
-#define RTMDIO_839X_CMD_MASK			GENMASK(3, 0)
 #define RTMDIO_839X_PHYREG_CTRL			(0x03E0)
 #define RTMDIO_839X_PHYREG_PORT_CTRL		(0x03E4)
 #define RTMDIO_839X_PHYREG_ACCESS_CTRL		(0x03DC)
+#define   RTMDIO_839X_CMD_FAIL			BIT(1)
+#define   RTMDIO_839X_CMD_READ_C22		0
+#define   RTMDIO_839X_CMD_READ_C45		BIT(2)
+#define   RTMDIO_839X_CMD_WRITE_C22		BIT(3)
+#define   RTMDIO_839X_CMD_WRITE_C45		BIT(2) | BIT(3)
+#define   RTMDIO_839X_CMD_MASK			GENMASK(3, 0)
 #define RTMDIO_839X_PHYREG_DATA_CTRL		(0x03F0)
 #define RTMDIO_839X_PHYREG_MMD_CTRL		(0x03F4)
 #define RTMDIO_839X_SMI_PORT_POLLING_CTRL	(0x03fc)
 #define RTMDIO_839X_SMI_GLB_CTRL		(0x03f8)
 
-#define RTMDIO_930X_CMD_FAIL			BIT(25)
-#define RTMDIO_930X_CMD_READ_C22		0
-#define RTMDIO_930X_CMD_READ_C45		BIT(1)
-#define RTMDIO_930X_CMD_WRITE_C22		BIT(2)
-#define RTMDIO_930X_CMD_WRITE_C45		BIT(1) | BIT(2)
-#define RTMDIO_930X_CMD_MASK			GENMASK(2, 0) | BIT(25)
 #define RTMDIO_930X_SMI_GLB_CTRL		(0xCA00)
 #define RTMDIO_930X_SMI_ACCESS_PHY_CTRL_0	(0xCB70)
 #define RTMDIO_930X_SMI_ACCESS_PHY_CTRL_1	(0xCB74)
+#define   RTMDIO_930X_CMD_FAIL			BIT(25)
+#define   RTMDIO_930X_CMD_READ_C22		0
+#define   RTMDIO_930X_CMD_READ_C45		BIT(1)
+#define   RTMDIO_930X_CMD_WRITE_C22		BIT(2)
+#define   RTMDIO_930X_CMD_WRITE_C45		BIT(1) | BIT(2)
+#define   RTMDIO_930X_CMD_MASK			GENMASK(2, 0) | BIT(25)
 #define RTMDIO_930X_SMI_ACCESS_PHY_CTRL_2	(0xCB78)
 #define RTMDIO_930X_SMI_ACCESS_PHY_CTRL_3	(0xCB7C)
 #define RTMDIO_930X_SMI_PORT0_15_POLLING_SEL	(0xCA08)
@@ -80,22 +80,24 @@
 #define RTMDIO_930X_SMI_10G_POLLING_REG10_CFG	(0xCBBC)
 #define RTMDIO_930X_SMI_PORT0_5_ADDR_CTRL	(0xCB80)
 
-#define RTMDIO_931X_CMD_FAIL			BIT(1)
-#define RTMDIO_931X_CMD_READ_C22		0
-#define RTMDIO_931X_CMD_READ_C45		BIT(3)
-#define RTMDIO_931X_CMD_WRITE_C22		BIT(4)
-#define RTMDIO_931X_CMD_WRITE_C45		BIT(3) | BIT(4)
-#define RTMDIO_931X_CMD_MASK			GENMASK(4, 0)
 #define RTMDIO_931X_SMI_PORT_POLLING_CTRL	(0x0CCC)
 #define RTMDIO_931X_SMI_INDRT_ACCESS_BC_CTRL	(0x0C14)
 #define RTMDIO_931X_SMI_GLB_CTRL0		(0x0CC0)
 #define RTMDIO_931X_SMI_GLB_CTRL1		(0x0CBC)
 #define RTMDIO_931X_SMI_INDRT_ACCESS_CTRL_0	(0x0C00)
+#define   RTMDIO_931X_CMD_FAIL			BIT(1)
+#define   RTMDIO_931X_CMD_READ_C22		0
+#define   RTMDIO_931X_CMD_READ_C45		BIT(3)
+#define   RTMDIO_931X_CMD_WRITE_C22		BIT(4)
+#define   RTMDIO_931X_CMD_WRITE_C45		BIT(3) | BIT(4)
+#define   RTMDIO_931X_CMD_MASK			GENMASK(4, 0)
 #define RTMDIO_931X_SMI_INDRT_ACCESS_CTRL_1	(0x0C04)
 #define RTMDIO_931X_SMI_INDRT_ACCESS_CTRL_2	(0x0C08)
 #define RTMDIO_931X_SMI_INDRT_ACCESS_CTRL_3	(0x0C10)
 #define RTMDIO_931X_SMI_INDRT_ACCESS_MMD_CTRL	(0x0C18)
-#define RTMDIO_931X_MAC_L2_GLOBAL_CTRL2		(0x1358)
+#define RTMDIO_931X_SMI_PHY_ABLTY_GET_SEL	(0x0CAC)
+#define   RTMDIO_931X_SMY_PHY_ABLTY_MDIO	0x0
+#define   RTMDIO_931X_SMI_PHY_ABLTY_SDS		0x2
 #define RTMDIO_931X_SMI_PORT_POLLING_SEL	(0x0C9C)
 #define RTMDIO_931X_SMI_PORT_ADDR_CTRL		(0x0C74)
 #define RTMDIO_931X_SMI_10GPHY_POLLING_SEL0	(0x0CF0)
@@ -715,6 +717,7 @@ static void rtmdio_930x_setup_polling(struct mii_bus *bus)
 	struct rtmdio_phy_info phyinfo;
 	unsigned int mask, val;
 
+	/* reset all ports to "SerDes driven" */
 	regmap_write(ctrl->map, RTMDIO_930X_SMI_MAC_TYPE_CTRL, 0);
 
 	/* Define PHY specific polling parameters */
@@ -722,7 +725,7 @@ static void rtmdio_930x_setup_polling(struct mii_bus *bus)
 		if (rtmdio_get_phy_info(bus, addr, &phyinfo))
 			continue;
 
-		/* port MAC type */
+		/* set port to "PHY driven" */
 		mask = addr > 23 ? 0x7 << ((addr - 24) * 3 + 12): 0x3 << ((addr / 4) * 2);
 		val = phyinfo.mac_type << (ffs(mask) - 1);
 		regmap_update_bits(ctrl->map, RTMDIO_930X_SMI_MAC_TYPE_CTRL, mask, val);
@@ -789,13 +792,12 @@ static void rtmdio_931x_setup_polling(struct mii_bus *bus)
 	struct rtmdio_phy_info phyinfo;
 	u32 val;
 
-	/* Define PHY specific polling parameters
-	 *
-	 * Those are applied per port here but the SoC only supports them
-	 * per SMI bus or for all GPHY/10GPHY. This should be guarded by
-	 * the existing hardware designs (i.e. only equally polled PHYs on
-	 * the same SMI bus or kind of PHYs).
-	 */
+	/* reset all ports to "SerDes driven" */
+	for (int reg = 0; reg < 4; reg++)
+		regmap_write(ctrl->map, RTMDIO_931X_SMI_PHY_ABLTY_GET_SEL + reg * 4,
+			     RTMDIO_931X_SMI_PHY_ABLTY_SDS * 0x55555555U);
+
+	/* Define PHY specific polling parameters */
 	for_each_port(ctrl, addr) {
 		int smi = ctrl->smi_bus[addr];
 		unsigned int mask, val;
@@ -803,6 +805,11 @@ static void rtmdio_931x_setup_polling(struct mii_bus *bus)
 		if (rtmdio_get_phy_info(bus, addr, &phyinfo))
 			continue;
 
+		/* set port to "PHY driven" */
+		mask = GENMASK(1, 0) << ((addr % 16) * 2);
+		val = RTMDIO_931X_SMY_PHY_ABLTY_MDIO << (ffs(mask) - 1);
+		regmap_update_bits(ctrl->map, RTMDIO_931X_SMI_PHY_ABLTY_GET_SEL + (addr / 16) * 4,
+				   mask, val);
 		mask = val = 0;
 
 		/* PRVTE0 polling */
