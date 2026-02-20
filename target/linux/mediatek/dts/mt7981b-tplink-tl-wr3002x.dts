@@ -1,0 +1,310 @@
+// SPDX-License-Identifier: (GPL-2.0 OR MIT)
+
+/dts-v1/;
+
+#include <dt-bindings/pinctrl/mt65xx.h>
+
+#include "mt7981b.dtsi"
+
+/ {
+	model = "TP-LINK TL-WR3002X";
+	compatible = "tplink,tl-wr3002x", "mediatek,mt7981";
+
+	aliases {
+        label-mac-device = &gmac1;
+        led-boot = &led_red;
+		led-failsafe = &led_red;
+		led-running = &led_blue;
+		led-upgrade = &led_red;
+		serial0 = &uart0;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+    memory {
+		reg = <0 0x40000000 0 0x20000000>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+
+        button-0 {
+			label = "reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+		};
+
+		button-1 {
+			label = "mode";
+			linux,code = <BTN_2>;
+			gpios = <&pio 7 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led_red: led-0 {
+			gpios = <&pio 34 GPIO_ACTIVE_LOW>;
+            color = <LED_COLOR_ID_RED>;
+            function = LED_FUNCTION_STATUS;
+		};
+
+		led_blue: led-1 {
+			gpios = <&pio 35 GPIO_ACTIVE_LOW>;
+            color = <LED_COLOR_ID_BLUE>;
+            function = LED_FUNCTION_STATUS;
+		};
+	};
+
+    reg_3p3v: regulator-3p3v {
+        compatible = "regulator-fixed";
+        regulator-name = "fixed-3.3V";
+        regulator-min-microvolt = <3300000>;
+        regulator-max-microvolt = <3300000>;
+        regulator-boot-on;
+        regulator-always-on;
+    };
+
+    reg_5v: regulator-5v {
+		compatible = "regulator-fixed";
+		regulator-name = "fixed-5V";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-boot-on;
+		regulator-always-on;
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&usb_phy {
+	status = "okay";
+};
+
+&watchdog {
+	status = "okay";
+};
+
+&xhci {
+	vbus-supply = <&reg_5v>;
+	status = "okay";
+};
+
+&mmc0 {
+    pinctrl-names = "default", "state_uhs";
+    pinctrl-0 = <&mmc0_pins_default>;
+    pinctrl-1 = <&mmc0_pins_uhs>;
+    bus-width = <4>;
+    max-frequency = <50000000>;
+    cap-sd-highspeed;
+    cd-gpios = <&pio 5 GPIO_ACTIVE_LOW>;
+    wp-gpios = <&pio 8 GPIO_ACTIVE_LOW>;
+    vmmc-supply = <&reg_3p3v>;
+    vqmmc-supply = <&reg_3p3v>;
+    status = "okay";
+};
+
+&eth {
+        status = "okay";
+
+        gmac0: mac@0 {
+                compatible = "mediatek,eth-mac";
+                reg = <0>;
+                phy-mode = "2500base-x";
+                phy-handle = <&phy5>;
+
+                nvmem-cells = <&macaddr_default_mac_08 1>;
+        		nvmem-cell-names = "mac-address";
+        };
+
+        gmac1: mac@1 {
+                compatible = "mediatek,eth-mac";
+                reg = <1>;
+                phy-mode = "gmii";
+                phy-handle = <&int_gbe_phy>;
+
+                nvmem-cells = <&macaddr_default_mac_08 0>;
+		        nvmem-cell-names = "mac-address";
+        };
+
+        mdio: mdio-bus {
+                #address-cells = <1>;
+                #size-cells = <1>;
+
+                phy5: phy@5 {
+                        compatible = "ethernet-phy-id67c9.de0a";
+                        reg = <5>;
+                        reset-gpios = <&pio 1 1>;
+                        reset-assert-us = <600>;
+                        reset-deassert-us = <20000>;
+                  };
+        };
+};
+
+
+&spi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spic_pins>;
+	status = "disabled";
+};
+
+&spi2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi2_flash_pins>;
+	status = "okay";
+
+	flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+        reg = <0>;
+		
+		spi-max-frequency = <52000000>;
+		spi-tx-buswidth = <4>;
+		spi-rx-buswidth = <4>;
+
+		partitions {
+            compatible = "fixed-partitions";
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+		    partition@0 {
+			    label = "bl2";
+			    reg = <0x00000 0x19000>;
+			    read-only;
+		    };
+
+            partition@19000 {
+                label = "fip";
+                reg = <0x19000 0xe6000>;
+                read-only;
+            };
+
+		    partition@ff000 {
+			    label = "u-boot-env";
+			    reg = <0xff000 0x1000>;
+			    read-only;
+		    };
+
+		    partition@100000 {
+			    label = "firmware";
+			    reg = <0x100000 0x1de0000>;
+		    };
+
+		    partition@1fdd000 {
+	    		label = "default_mac";
+	    		reg = <0x1fdd000 0x1000>;
+		    	read-only;
+
+		    	nvmem-layout {
+		    		compatible = "fixed-layout";
+		    		#address-cells = <1>;
+		    		#size-cells = <1>;
+
+				    macaddr_default_mac_08: macaddr@08 {
+					    compatible = "mac-base";
+					    reg = <0x8 0x6>;
+					    #nvmem-cell-cells = <1>;
+				    };
+			    };
+            };
+
+		    partition@1fe0000 {
+	    		label = "radio";
+	    		reg = <0x1fe0000 0x10000>;
+		    	read-only;
+
+			    nvmem-layout {
+		    		compatible = "fixed-layout";
+		    		#address-cells = <1>;
+		    		#size-cells = <1>;
+
+				    eeprom_radio_0: eeprom@0 {
+					    reg = <0x0 0x1000>;
+				    };
+			    };
+		    };
+        };
+    };
+};
+
+&pio {
+	spic_pins: spi1-pins {
+		mux {
+			function = "spi";
+			groups = "spi1_1";
+		};
+	};
+
+	spi2_flash_pins: spi2-pins {
+		mux {
+			function = "spi";
+			groups = "spi2", "spi2_wp_hold";
+		};
+
+		conf-pu {
+			pins = "SPI2_CS", "SPI2_HOLD", "SPI2_WP";
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
+		};
+
+		conf-pd {
+			pins = "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
+        };
+    };
+
+    mmc0_pins_default: mmc0-pins-default {
+		mux {
+			function = "flash";
+			groups = "emmc_45";
+		};
+		
+		conf-cmd-dat {
+			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO",
+			       "SPI0_CS", "SPI1_MISO";
+			input-enable;
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+		conf-clk {
+			pins = "SPI1_CS";
+			drive-strength = <MTK_DRIVE_12mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+	};
+
+	mmc0_pins_uhs: mmc0-pins-uhs {
+		mux {
+			function = "flash";
+			groups = "emmc_45";
+		};
+		conf-cmd-dat {
+			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO",
+			       "SPI0_CS", "SPI1_MISO";
+			input-enable;
+            drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_01>;
+		};
+
+		conf-clk {
+			pins = "SPI1_CS";
+			drive-strength = <MTK_DRIVE_12mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_10>;
+		};
+	};
+};
+
+&wifi {
+	status = "okay";
+    nvmem-cells = <&eeprom_radio_0>;
+	nvmem-cell-names = "eeprom";
+	
+};
