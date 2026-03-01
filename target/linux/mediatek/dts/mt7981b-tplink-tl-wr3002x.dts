@@ -21,6 +21,9 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+        bootargs-override = "console=ttyS0,115200n1 loglevel=8  \
+				earlycon=uart8250,mmio32,0x11002000";
+        
 	};
 
     memory {
@@ -97,6 +100,7 @@
 };
 
 &mmc0 {
+    status = "disabled";
     pinctrl-names = "default", "state_uhs";
     pinctrl-0 = <&mmc0_pins_default>;
     pinctrl-1 = <&mmc0_pins_uhs>;
@@ -107,7 +111,7 @@
     wp-gpios = <&pio 8 GPIO_ACTIVE_LOW>;
     vmmc-supply = <&reg_3p3v>;
     vqmmc-supply = <&reg_3p3v>;
-    status = "okay";
+    
 };
 
 &eth {
@@ -118,7 +122,8 @@
                 reg = <0>;
                 phy-mode = "2500base-x";
                 phy-handle = <&phy5>;
-
+bootargs = "console=ttyS0,115200n1 loglevel=8  \
+				earlycon=uart8250,mmio32,0x11002000";
                 nvmem-cells = <&macaddr_default_mac_08 1>;
         		nvmem-cell-names = "mac-address";
         };
@@ -146,7 +151,6 @@
                   };
         };
 };
-
 
 &spi1 {
 	pinctrl-names = "default";
@@ -191,12 +195,12 @@
 		    };
 
 		    partition@100000 {
-			    label = "firmware";
+                label = "firmware";
 			    reg = <0x100000 0x1de0000>;
 		    };
 
 		    partition@1fdd000 {
-	    		label = "default_mac";
+	    		label = "default-mac";
 	    		reg = <0x1fdd000 0x1000>;
 		    	read-only;
 
