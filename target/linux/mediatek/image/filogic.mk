@@ -2880,11 +2880,12 @@ define Device/tplink_tl-wr3002x
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware \
   	kmod-usb3
   IMAGE_SIZE := 30592k
-  IMAGES := factory.bin sysupgrade.bin
+  IMAGES := sysupgrade.bin
   KERNEL := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
-  IMAGE/factory.bin := $$(IMAGE/sysupgrade.bin)
-  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.bin := append-kernel | pad-to 128k | append-rootfs | pad-rootfs | check-size | append-metadata
 endef
 TARGET_DEVICES += tplink_tl-wr3002x
 
