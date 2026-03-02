@@ -195,6 +195,7 @@ bootargs = "console=ttyS0,115200n1 loglevel=8  \
 		    };
 
 		    partition@100000 {
+				compatible = "denx,fit";
                 label = "firmware";
 			    reg = <0x100000 0x1de0000>;
 		    };
