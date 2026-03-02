@@ -122,8 +122,6 @@
                 reg = <0>;
                 phy-mode = "2500base-x";
                 phy-handle = <&phy5>;
-bootargs = "console=ttyS0,115200n1 loglevel=8  \
-				earlycon=uart8250,mmio32,0x11002000";
                 nvmem-cells = <&macaddr_default_mac_08 1>;
         		nvmem-cell-names = "mac-address";
         };
