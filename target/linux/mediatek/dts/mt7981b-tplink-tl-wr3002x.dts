@@ -122,9 +122,7 @@
                 reg = <0>;
                 phy-mode = "2500base-x";
                 phy-handle = <&phy5>;
-bootargs = "console=ttyS0,115200n1 loglevel=8  \
-				earlycon=uart8250,mmio32,0x11002000";
-                nvmem-cells = <&macaddr_default_mac_08 1>;
+				nvmem-cells = <&macaddr_default_mac_08 1>;
         		nvmem-cell-names = "mac-address";
         };
 
@@ -133,7 +131,6 @@ bootargs = "console=ttyS0,115200n1 loglevel=8  \
                 reg = <1>;
                 phy-mode = "gmii";
                 phy-handle = <&int_gbe_phy>;
-
                 nvmem-cells = <&macaddr_default_mac_08 0>;
 		        nvmem-cell-names = "mac-address";
         };
@@ -195,6 +192,7 @@ bootargs = "console=ttyS0,115200n1 loglevel=8  \
 		    };
 
 		    partition@100000 {
+				compatible = "denx,fit";
                 label = "firmware";
 			    reg = <0x100000 0x1de0000>;
 		    };
