@@ -21,8 +21,7 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
-        bootargs-override = "console=ttyS0,115200n1 loglevel=8  \
-				earlycon=uart8250,mmio32,0x11002000";
+        bootargs-override = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000";
         
 	};
 
