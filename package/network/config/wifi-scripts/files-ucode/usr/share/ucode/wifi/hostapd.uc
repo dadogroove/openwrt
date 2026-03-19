@@ -354,9 +354,9 @@ function device_htmode_append(config) {
 			config.vht_capab += '[BF-ANTENNA-' + min(((vht_capab >> 13) & 3) + 1, config.beamformer_antennas) + ']';
 
 		/* supported Channel widths */
-		if ((vht_capab & 0xc) == 8 && config.vht160 <= 2)
+		if ((vht_capab & 0xc) == 8 && config.vht160 >= 2)
 			config.vht_capab += '[VHT160-80PLUS80]';
-		else if ((vht_capab & 0xc) == 4 && config.vht160 <= 2)
+		else if (((vht_capab & 0xc) == 4 || (vht_capab & 0xc) == 8) && config.vht160 >= 1)
 			config.vht_capab += '[VHT160]';
 
 		/* maximum MPDU length */
