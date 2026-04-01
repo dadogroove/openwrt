@@ -1412,7 +1412,9 @@ struct rtldsa_config {
 	int imr_glb;
 	int n_counters;
 	int n_pie_blocks;
+	u8 cpu_port;
 	u8 port_ignore;
+	u32 fib_entries;
 	int trk_ctrl;
 	int trk_hash_ctrl;
 	void (*vlan_tables_read)(u32 vlan, struct rtl838x_vlan_info *info);
@@ -1515,11 +1517,7 @@ struct rtl838x_switch_priv {
 	int mirror_group_ports[4];
 	struct mii_bus *parent_bus;
 	const struct rtldsa_config *r;
-	u8 cpu_port;
-	u8 port_mask;
-	u8 port_width;
 	u64 irq_mask;
-	u32 fib_entries;
 	int l2_bucket_size;
 	u16 n_mst;
 	struct dentry *dbgfs_dir;
