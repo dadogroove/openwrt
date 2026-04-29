@@ -17,7 +17,7 @@
 		// TODO: Verify if the ethernet0 alias is needed
 		ethernet0 = &gmac;
 		label-mac-device = &gmac0;
-		led-boot = &led0_blue;
+		led-boot = &led0_green;
 		led-failsafe = &led0_red;
 		led-running = &led0_blue;
 		led-upgrade = &led0_red;
@@ -340,7 +340,7 @@
 			function = LED_FUNCTION_FAULT;
 		};
 
-		led@1 {
+		led0_green: led@1 {
 			reg = <1>;
 			chan-name = "LED0_Green";
 			led-cur = /bits/ 8 <0x64>;
