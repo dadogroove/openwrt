@@ -1,0 +1,24 @@
+Date: Fri, 20 Feb 2026 16:39:55 -0600
+Subject: [PATCH] mtd: spi-nor: Add support for XMC XM25QH256C
+
+Add MTD support for the XMC XM25QH256C SPI NOR chip.
+The chip has 32MB of total capacity, divided into a total of 256
+sectors, each 64KB sized. The chip also supports 4KB sectors.
+ 
+ drivers/mtd/spi-nor/xmc.c | 5 +++++ 
+ 1 files changed, 5 insertions(+)
+ 
+--- a/drivers/mtd/spi-nor/xmc.c
++++ b/drivers/mtd/spi-nor/xmc.c
+@@ -29,6 +29,11 @@
+ 		.name = "XM25QH128C",
+ 		.size = SZ_16M,
+ 		.no_sfdp_flags = SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ,
++	}, {
++		.id = SNOR_ID(0x20, 0x40, 0x19),
++		.name = "XM25QH256C",
++		.size = SZ_32M,
++		.no_sfdp_flags = SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ,
+ 	},
+ };
+
