@@ -240,6 +240,7 @@ platform_do_upgrade() {
 	cudy,wr3000-v1|\
 	kebidumei,ax3000-u22|\
 	totolink,x6000r|\
+	tplink,tl-wr3002x|\
 	wavlink,wl-wn573hx3|\
 	wavlink,wl-wnt100x3|\
 	widelantech,wap430x|\
