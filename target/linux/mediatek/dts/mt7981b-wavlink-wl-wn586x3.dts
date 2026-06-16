@@ -26,7 +26,7 @@
 	gpio-keys {
 		compatible = "gpio-keys";
 
-		button-reset {
+		button-0 {
 			label = "reset";
 			linux,code = <KEY_RESTART>;
 			gpios = <&pio 11 GPIO_ACTIVE_LOW>;
@@ -81,13 +81,17 @@
 };
 
 &eth {
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio_pins>;
+
 	status = "okay";
 
 	gmac0: mac@0 {
 		compatible = "mediatek,eth-mac";
 		reg = <0>;
 		phy-mode = "2500base-x";
-		nvmem-cells = <&macaddr_hw_44e 0>;
+		nvmem-cells = <&macaddr_factory_3fff4>;
 		nvmem-cell-names = "mac-address";
 
 		fixed-link {
@@ -102,7 +106,7 @@
 		reg = <1>;
 		phy-mode = "gmii";
 		phy-handle = <&int_gbe_phy>;
-		nvmem-cells = <&macaddr_hw_44e 1>;
+		nvmem-cells = <&macaddr_factory_3fffa>;
 		nvmem-cell-names = "mac-address";
 	};
 };
@@ -120,8 +124,6 @@
 };
 
 &spi0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&spi0_flash_pins>;
 	status = "disabled";
 };
 
@@ -134,9 +136,7 @@
 		compatible = "jedec,spi-nor";
 		reg = <0>;
 
-		spi-max-frequency = <25000000>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
+		spi-max-frequency = <50000000>;
 
 		partitions {
 			compatible = "fixed-partitions";
@@ -169,10 +169,12 @@
 						reg = <0x0 0x1000>;
 					};
 
-					macaddr_factory_4: macaddr@4 {
-						compatible = "mac-base";
-						reg = <0x4 0x6>;
-						#nvmem-cell-cells = <1>;
+					macaddr_factory_3fff4: macaddr@3fff4 {
+                        reg = <0x3fff4 0x6>;
+                    };
+
+                    macaddr_factory_3fffa: macaddr@3fffa {
+                        reg = <0x3fffa 0x6>;
 					};
 				};
 			};
@@ -184,6 +186,7 @@
 			};
 
 			partition@f0000 {
+				compatible = "denx,fit";
 				label = "firmware";
 				reg = <0x180000 0xe00000>;
 			};
@@ -192,17 +195,6 @@
 				label = "hw";
 				reg = <0xf80000 0x80000>;
 
-				nvmem-layout {
-					compatible = "fixed-layout";
-					#address-cells = <1>;
-					#size-cells = <1>;
-
-					macaddr_hw_44e: macaddr@44e {
-						compatible = "mac-base";
-						reg = <0x44e 0x11>;
-						#nvmem-cell-cells = <1>;
-					};
-				};
 			};
 		};
 	};
@@ -224,13 +216,13 @@
 
 		conf-pu {
 			pins = "SPI2_CS", "SPI2_HOLD", "SPI2_WP";
-			drive-strength = <MTK_DRIVE_8mA>;
+			drive-strength = <MTK_DRIVE_4mA>;
 			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
 		};
 
 		conf-pd {
 			pins = "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
-			drive-strength = <MTK_DRIVE_8mA>;
+			drive-strength = <MTK_DRIVE_4mA>;
 			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
 		};
 	};
@@ -267,7 +259,6 @@
 
 &wifi {
 	status = "okay";
-
-	nvmem-cells = <&eeprom_factory_0>, <&macaddr_factory_4 0>;
-	nvmem-cell-names = "eeprom", "mac-address";
+	nvmem-cells = <&eeprom_factory_0>;
+	nvmem-cell-names = "eeprom";
 };
