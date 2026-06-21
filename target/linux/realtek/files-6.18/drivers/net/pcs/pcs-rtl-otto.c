@@ -199,6 +199,13 @@ struct rtpcs_sds_ops {
 	int (*deactivate)(struct rtpcs_serdes *sds);
 	/* required: power back up */
 	int (*activate)(struct rtpcs_serdes *sds);
+	/* required: configure SerDes for hardware mode */
+	int (*config_hw_mode)(struct rtpcs_serdes *sds, enum rtpcs_sds_mode hw_mode);
+	/* required: set hardware mode */
+	int (*set_hw_mode)(struct rtpcs_serdes *sds, enum rtpcs_sds_mode hw_mode);
+	/* optional: configure media-specific parameters */
+	int (*config_media)(struct rtpcs_serdes *sds, enum rtpcs_sds_media media,
+			    enum rtpcs_sds_mode hw_mode);
 	/* optional: finalization that must follow power-up, e.g. RX calibration */
 	int (*post_config)(struct rtpcs_serdes *sds, enum rtpcs_sds_mode hw_mode);
 };
@@ -273,7 +280,6 @@ struct rtpcs_config {
 
 	int (*init)(struct rtpcs_ctrl *ctrl);
 	int (*sds_probe)(struct rtpcs_serdes *sds);
-	int (*setup_serdes)(struct rtpcs_serdes *sds, enum rtpcs_sds_mode hw_mode);
 };
 
 struct rtpcs_sds_config {
@@ -506,6 +512,26 @@ static int rtpcs_sds_determine_hw_mode(struct rtpcs_serdes *sds,
 
 	if (!test_bit(*hw_mode, sds->supported_modes))
 		return -EOPNOTSUPP;
+
+	return 0;
+}
+
+static int rtpcs_sds_select_media(enum rtpcs_sds_mode hw_mode, enum rtpcs_sds_media *media)
+{
+	switch (hw_mode) {
+	case RTPCS_SDS_MODE_OFF:
+		*media = RTPCS_SDS_MEDIA_NONE;
+		break;
+	case RTPCS_SDS_MODE_SGMII:
+	case RTPCS_SDS_MODE_1000BASEX:
+	case RTPCS_SDS_MODE_2500BASEX:
+	case RTPCS_SDS_MODE_10GBASER:
+		*media = RTPCS_SDS_MEDIA_FIBER;
+		break;
+	default:
+		*media = RTPCS_SDS_MEDIA_PCB;
+		break;
+	}
 
 	return 0;
 }
@@ -768,6 +794,8 @@ static int rtpcs_838x_sds_activate(struct rtpcs_serdes *sds)
 {
 	int ret;
 
+	rtpcs_838x_sds_reset(sds);
+
 	/* CFG_FIB_PDOWN / BMCR_PDOWN */
 	ret = rtpcs_sds_write_bits(sds, 2, MII_BMCR, 11, 11, 0x0);
 	if (ret)
@@ -816,8 +844,7 @@ static int rtpcs_838x_sds_set_mode(struct rtpcs_serdes *sds, enum rtpcs_sds_mode
 				 0x7 << int_mode_shift, int_mode_val << int_mode_shift);
 }
 
-static int rtpcs_838x_sds_patch(struct rtpcs_serdes *sds,
-				enum rtpcs_sds_mode hw_mode)
+static int rtpcs_838x_sds_config_hw_mode(struct rtpcs_serdes *sds, enum rtpcs_sds_mode hw_mode)
 {
 	struct rtpcs_ctrl *ctrl = sds->ctrl;
 	u8 sds_id = sds->id;
@@ -887,23 +914,6 @@ static int rtpcs_838x_init(struct rtpcs_ctrl *ctrl)
 	/* power off and reset all SerDes */
 	regmap_write(ctrl->map, RTPCS_838X_SDS_CFG_REG, 0x3f);
 	regmap_write(ctrl->map, RTPCS_838X_RST_GLB_CTRL_0, 0x10); /* SW_SERDES_RST */
-	return 0;
-}
-
-static int rtpcs_838x_setup_serdes(struct rtpcs_serdes *sds,
-				   enum rtpcs_sds_mode hw_mode)
-{
-	int ret;
-
-	rtpcs_838x_sds_patch(sds, hw_mode);
-
-	ret = rtpcs_838x_sds_set_mode(sds, hw_mode);
-	if (ret)
-		return ret;
-
-	sds->hw_mode = hw_mode;
-
-	rtpcs_838x_sds_reset(sds);
 	return 0;
 }
 
@@ -1152,28 +1162,16 @@ static int rtpcs_839x_sds_deactivate(struct rtpcs_serdes *sds)
 
 static int rtpcs_839x_sds_activate(struct rtpcs_serdes *sds)
 {
+	rtpcs_839x_sds_reset(sds);
 	return 0;
 }
 
-static int rtpcs_839x_setup_serdes(struct rtpcs_serdes *sds,
-				   enum rtpcs_sds_mode hw_mode)
+/*
+ * Keep this as a no-op stub until RTL839x is extended to do proper configuration
+ * here. E.g., the still missing SGMII, 100BASEX and 1000BASEX setup should go here.
+ */
+static int rtpcs_839x_sds_config_hw_mode(struct rtpcs_serdes *sds, enum rtpcs_sds_mode hw_mode)
 {
-	int ret;
-
-	/* Don't touch 5G SerDes, they are already properly configured
-	 * at startup for QSGMII. Thus, connected PHYs should work out
-	 * of the box.
-	 */
-	if (sds->type == RTPCS_SDS_TYPE_5G)
-		return 0;
-
-	ret = rtpcs_sds_set_mac_mode(sds, hw_mode);
-	if (ret < 0)
-		return ret;
-
-	sds->hw_mode = hw_mode;
-
-	rtpcs_839x_sds_reset(sds);
 	return 0;
 }
 
@@ -3068,18 +3066,9 @@ static int rtpcs_930x_sds_cmu_band_get(struct rtpcs_serdes *sds)
 	return cmu_band;
 }
 
-static int rtpcs_930x_setup_serdes(struct rtpcs_serdes *sds,
-				   enum rtpcs_sds_mode hw_mode)
+static int rtpcs_930x_sds_config_media(struct rtpcs_serdes *sds, enum rtpcs_sds_media media,
+				       enum rtpcs_sds_mode hw_mode)
 {
-	int ret;
-
-	/* Apply configuration for a hardware mode to SerDes */
-	ret = rtpcs_930x_sds_config_hw_mode(sds, hw_mode);
-	if (ret < 0)
-		return ret;
-
-	/* Maybe use dal_longan_sds_init */
-
 	/*
 	 * dal_longan_construct_mac_default_10gmedia_fiber: set medium to fiber.
 	 * TODO: this is unconditional regardless of hw_mode; needs mode-aware
@@ -3088,14 +3077,6 @@ static int rtpcs_930x_setup_serdes(struct rtpcs_serdes *sds,
 	rtpcs_sds_write_bits(sds, 0x1f, 11, 1, 1, 1);
 
 	rtpcs_930x_sds_tx_config(sds, hw_mode);
-
-	/* Enable SDS in desired mode */
-	ret = rtpcs_930x_sds_set_mode(sds, hw_mode);
-	if (ret < 0)
-		return ret;
-
-	sds->hw_mode = hw_mode;
-
 	return 0;
 }
 
@@ -3684,8 +3665,8 @@ static int rtpcs_931x_sds_config_rx(struct rtpcs_serdes *sds,
 	return 0;
 }
 
-static int rtpcs_931x_sds_set_media(struct rtpcs_serdes *sds, enum rtpcs_sds_media sds_media,
-				    enum rtpcs_sds_mode hw_mode)
+static int rtpcs_931x_sds_config_media(struct rtpcs_serdes *sds, enum rtpcs_sds_media sds_media,
+				       enum rtpcs_sds_mode hw_mode)
 {
 	struct rtpcs_serdes *even_sds = rtpcs_sds_get_even(sds);
 	bool is_dac, is_10g;
@@ -3853,51 +3834,7 @@ static int rtpcs_931x_sds_config_hw_mode(struct rtpcs_serdes *sds,
 		return -ENOTSUPP;
 	}
 
-	return 0;
-}
-
-static int rtpcs_931x_setup_serdes(struct rtpcs_serdes *sds,
-				   enum rtpcs_sds_mode hw_mode)
-{
-	struct rtpcs_ctrl *ctrl = sds->ctrl;
-	enum rtpcs_sds_media sds_media;
-	int ret;
-
-	ret = rtpcs_931x_sds_config_hw_mode(sds, hw_mode);
-	if (ret < 0)
-		return ret;
-
-	ret = rtpcs_93xx_sds_config_cmu(sds, hw_mode);
-	if (ret < 0)
-		return ret;
-
-	switch (hw_mode) {
-	case RTPCS_SDS_MODE_OFF:
-		sds_media = RTPCS_SDS_MEDIA_NONE;
-		break;
-	case RTPCS_SDS_MODE_SGMII:
-	case RTPCS_SDS_MODE_1000BASEX:
-	case RTPCS_SDS_MODE_2500BASEX:
-	case RTPCS_SDS_MODE_10GBASER:
-		sds_media = RTPCS_SDS_MEDIA_FIBER;
-		break;
-	default:
-		sds_media = RTPCS_SDS_MEDIA_PCB;
-		break;
-	}
-	ret = rtpcs_931x_sds_set_media(sds, sds_media, hw_mode);
-	if (ret < 0) {
-		dev_err(ctrl->dev, "failed to config SerDes for media: %d\n", ret);
-		return ret;
-	}
-
-	ret = rtpcs_931x_sds_set_mode(sds, hw_mode);
-	if (ret < 0)
-		return ret;
-
-	sds->hw_mode = hw_mode;
-
-	return 0;
+	return rtpcs_93xx_sds_config_cmu(sds, hw_mode);
 }
 
 /**
@@ -4099,6 +4036,7 @@ static int rtpcs_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 	struct rtpcs_link *link = rtpcs_phylink_pcs_to_link(pcs);
 	struct rtpcs_ctrl *ctrl = link->ctrl;
 	struct rtpcs_serdes *sds = link->sds;
+	enum rtpcs_sds_media sds_media;
 	enum rtpcs_sds_mode hw_mode;
 	int ret;
 
@@ -4125,9 +4063,25 @@ static int rtpcs_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 			if (ret < 0)
 				return ret;
 
-			ret = ctrl->cfg->setup_serdes(sds, hw_mode);
+			ret = sds->ops->config_hw_mode(sds, hw_mode);
 			if (ret < 0)
 				return ret;
+
+			if (sds->ops->config_media) {
+				ret = rtpcs_sds_select_media(hw_mode, &sds_media);
+				if (ret < 0)
+					return ret;
+
+				ret = sds->ops->config_media(sds, sds_media, hw_mode);
+				if (ret < 0)
+					return ret;
+			}
+
+			ret = sds->ops->set_hw_mode(sds, hw_mode);
+			if (ret < 0)
+				return ret;
+
+			sds->hw_mode = hw_mode;
 
 			ret = sds->ops->activate(sds);
 			if (ret < 0)
@@ -4418,6 +4372,8 @@ static const struct rtpcs_sds_ops rtpcs_838x_sds_ops = {
 	.restart_autoneg	= rtpcs_generic_sds_restart_autoneg,
 	.deactivate		= rtpcs_838x_sds_deactivate,
 	.activate		= rtpcs_838x_sds_activate,
+	.config_hw_mode		= rtpcs_838x_sds_config_hw_mode,
+	.set_hw_mode		= rtpcs_838x_sds_set_mode,
 	.post_config		= rtpcs_838x_sds_post_config,
 };
 
@@ -4442,7 +4398,6 @@ static const struct rtpcs_config rtpcs_838x_cfg = {
 	.sds_hw_mode_vals	= rtpcs_838x_sds_hw_mode_vals,
 	.init			= rtpcs_838x_init,
 	.sds_probe		= rtpcs_838x_sds_probe,
-	.setup_serdes		= rtpcs_838x_setup_serdes,
 };
 
 static const struct phylink_pcs_ops rtpcs_839x_pcs_ops = {
@@ -4458,6 +4413,8 @@ static const struct rtpcs_sds_ops rtpcs_839x_sds_ops = {
 	.restart_autoneg	= rtpcs_generic_sds_restart_autoneg,
 	.deactivate		= rtpcs_839x_sds_deactivate,
 	.activate		= rtpcs_839x_sds_activate,
+	.config_hw_mode		= rtpcs_839x_sds_config_hw_mode,
+	.set_hw_mode		= rtpcs_sds_set_mac_mode,
 };
 
 static const struct rtpcs_sds_regs rtpcs_839x_sds_regs = {
@@ -4481,7 +4438,6 @@ static const struct rtpcs_config rtpcs_839x_cfg = {
 	.sds_hw_mode_vals	= rtpcs_839x_sds_hw_mode_vals,
 	.init			= rtpcs_839x_init,
 	.sds_probe		= rtpcs_839x_sds_probe,
-	.setup_serdes		= rtpcs_839x_setup_serdes,
 };
 
 static const struct phylink_pcs_ops rtpcs_930x_pcs_ops = {
@@ -4503,6 +4459,9 @@ static const struct rtpcs_sds_ops rtpcs_930x_sds_ops = {
 	.config_polarity	= rtpcs_930x_sds_config_polarity,
 	.deactivate		= rtpcs_930x_sds_deactivate,
 	.activate		= rtpcs_930x_sds_activate,
+	.config_hw_mode		= rtpcs_930x_sds_config_hw_mode,
+	.set_hw_mode		= rtpcs_930x_sds_set_mode,
+	.config_media		= rtpcs_930x_sds_config_media,
 	.post_config		= rtpcs_930x_sds_post_config,
 };
 
@@ -4527,7 +4486,6 @@ static const struct rtpcs_config rtpcs_930x_cfg = {
 	.sds_hw_mode_vals	= rtpcs_93xx_sds_hw_mode_vals,
 	.init			= rtpcs_93xx_init,
 	.sds_probe		= rtpcs_930x_sds_probe,
-	.setup_serdes		= rtpcs_930x_setup_serdes,
 };
 
 static const struct phylink_pcs_ops rtpcs_931x_pcs_ops = {
@@ -4548,6 +4506,9 @@ static const struct rtpcs_sds_ops rtpcs_931x_sds_ops = {
 	.config_polarity	= rtpcs_931x_sds_config_polarity,
 	.deactivate		= rtpcs_931x_sds_deactivate,
 	.activate		= rtpcs_931x_sds_activate,
+	.config_hw_mode		= rtpcs_931x_sds_config_hw_mode,
+	.set_hw_mode		= rtpcs_931x_sds_set_mode,
+	.config_media		= rtpcs_931x_sds_config_media,
 };
 
 static const struct rtpcs_sds_regs rtpcs_931x_sds_regs = {
@@ -4571,7 +4532,6 @@ static const struct rtpcs_config rtpcs_931x_cfg = {
 	.sds_hw_mode_vals	= rtpcs_93xx_sds_hw_mode_vals,
 	.init			= rtpcs_931x_init,
 	.sds_probe		= rtpcs_931x_sds_probe,
-	.setup_serdes		= rtpcs_931x_setup_serdes,
 };
 
 static const struct of_device_id rtpcs_of_match[] = {
