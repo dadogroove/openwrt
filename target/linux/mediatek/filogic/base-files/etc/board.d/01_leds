@@ -318,6 +318,7 @@ tplink,re6000xd)
 wavlink,wl-wn536ax6-a)
 	ucidef_set_led_netdev "wan" "wan" "blue:wan" "eth1" "link tx rx"
 	;;
+wavlink,wl-wn551x1b-ubootmod|\
 wavlink,wl-wn551x3)
         ucidef_set_led_netdev "lan-1" "lan-1" "green:lan-1" "lan1" "link tx rx"
         ucidef_set_led_netdev "lan-2" "lan-2" "green:lan-2" "lan2" "link tx rx"
