@@ -317,6 +317,18 @@ define U-Boot/mt7981_comfast_cf-wr632ax
   DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ddr3-1866
 endef
 
+define U-Boot/mt7981_comfast_cf-wr633ax
+  NAME:=COMFAST CF-WR633AX
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=comfast_cf-wr633ax-ubootmod
+  UBOOT_CONFIG:=mt7981_comfast_cf-wr633ax
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr3
+  DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ddr3
+endef
+
 define U-Boot/mt7981_creatlentem_clt-r30b1-ubi
   NAME:=CreatLentem CLT-R30B1 (UBI)
   BUILD_SUBTARGET:=filogic
@@ -694,6 +706,18 @@ define U-Boot/mt7981_snr_snr-cpe-ax2
   BUILD_SUBTARGET:=filogic
   BUILD_DEVICES:=snr_snr-cpe-ax2
   UBOOT_CONFIG:=mt7981_snr_snr-cpe-ax2
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr3
+  DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ddr3
+endef
+
+define U-Boot/mt7981_wavlink_wl-wn551x1b
+  NAME:=WAVLINK WL-WN551X1B
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=wavlink_wl-wn551x1b-ubootmod
+  UBOOT_CONFIG:=mt7981_wavlink_wl-wn551x1b
   UBOOT_IMAGE:=u-boot.fip
   BL2_BOOTDEV:=spim-nand
   BL2_SOC:=mt7981
@@ -1259,6 +1283,7 @@ UBOOT_TARGETS := \
 	mt7981_cmcc_rax3000m-nand-ddr3 \
 	mt7981_cmcc_rax3000m-nand-ddr4 \
 	mt7981_comfast_cf-wr632ax \
+	mt7981_comfast_cf-wr633ax \
 	mt7981_creatlentem_clt-r30b1-ubi \
 	mt7981_cudy_tr3000-v1 \
 	mt7981_cudy_wbr3000uax-v1 \
@@ -1291,6 +1316,7 @@ UBOOT_TARGETS := \
 	mt7981_qihoo_360t7 \
 	mt7981_qihoo_360t7-ubi \
 	mt7981_snr_snr-cpe-ax2 \
+	mt7981_wavlink_wl-wn551x1b \
 	mt7981_wavlink_wl-wnt100x3 \
 	mt7981_xiaomi_mi-router-ax3000t \
 	mt7981_xiaomi_mi-router-wr30u \
