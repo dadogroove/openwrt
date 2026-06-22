@@ -147,6 +147,7 @@ platform_do_upgrade() {
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubootmod|\
 	creatlentem,clt-r30b1-ubi|\
 	cudy,tr3000-v1-ubootmod|\
 	cudy,wbr3000uax-v1-ubootmod|\
@@ -180,6 +181,7 @@ platform_do_upgrade() {
 	tplink,tl-xdr6086|\
 	tplink,tl-xdr6088|\
 	tplink,tl-xtr8488|\
+	wavlink,wl-wn551x1b-ubootmod|\
 	wavlink,wl-wnt100x3-ubootmod|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,redmi-router-ax6000-ubootmod|\
@@ -245,7 +247,9 @@ platform_do_upgrade() {
 	cudy,wr3000-v1|\
 	kebidumei,ax3000-u22|\
 	totolink,x6000r|\
+	tplink,tl-wr3002x|\
 	wavlink,wl-wn573hx3|\
+	wavlink,wl-wn586x3|\
 	wavlink,wl-wnt100x3|\
 	widelantech,wap430x|\
 	yuncore,ax835)
@@ -361,6 +365,7 @@ platform_check_image() {
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubootmod|\
 	creatlentem,clt-r30b1-ubi|\
 	cudy,tr3000-v1-ubootmod|\
 	cudy,wbr3000uax-v1-ubootmod|\
@@ -388,6 +393,7 @@ platform_check_image() {
 	tplink,tl-xdr6086|\
 	tplink,tl-xdr6088|\
 	tplink,tl-xtr8488|\
+	wavlink,wl-wn551x1b-ubootmod|\
 	wavlink,wl-wnt100x3-ubootmod|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,redmi-router-ax6000-ubootmod|\
@@ -398,7 +404,7 @@ platform_check_image() {
 		;;
 	creatlentem,clt-r30b1|\
 	creatlentem,clt-r30b1-112m|\
-	nradio,c8-668gl)
+	nradio,c8-668gl)comfast,cf-wr633ax-ubootmod|\
 		# tar magic `ustar`
 		magic="$(dd if="$1" bs=1 skip=257 count=5 2>/dev/null)"
 
