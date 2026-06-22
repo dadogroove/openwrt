@@ -1027,6 +1027,43 @@ define Device/comfast_cf-wr632ax-ubootmod
 endef
 TARGET_DEVICES += comfast_cf-wr632ax-ubootmod
 
+define Device/comfast_cf-wr633ax-common
+  DEVICE_VENDOR := COMFAST
+  DEVICE_MODEL := CF-WR633AX
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+endef
+
+define Device/comfast_cf-wr633ax
+  DEVICE_DTS := mt7981a-comfast-cf-wr633ax
+  IMAGE_SIZE := 65536k
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  $(call Device/comfast_cf-wr633ax-common)
+endef
+TARGET_DEVICES += comfast_cf-wr633ax
+
+define Device/comfast_cf-wr633ax-ubootmod
+  DEVICE_VARIANT := (OpenWrt U-Boot layout)
+  DEVICE_DTS := mt7981a-comfast-cf-wr633ax-ubootmod
+  UBOOTENV_IN_UBI := 1
+  IMAGES := sysupgrade.itb
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | append-metadata
+  ARTIFACTS := preloader.bin bl31-uboot.fip
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot comfast_cf-wr633ax
+  $(call Device/comfast_cf-wr633ax-common)
+endef
+TARGET_DEVICES += comfast_cf-wr633ax-ubootmod
+
 define Device/comfast_cf-xr186
   DEVICE_VENDOR := COMFAST
   DEVICE_MODEL := CF-XR186
@@ -3173,6 +3210,24 @@ define Device/tplink_fr365-v1
 endef
 TARGET_DEVICES += tplink_fr365-v1
 
+define Device/tplink_tl-wr3002x
+  DEVICE_VENDOR := TP-Link
+  DEVICE_MODEL := TL-WR3002X
+  DEVICE_DTS := mt7981b-tplink-tl-wr3002x
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTS_LOADADDR := 0x47000000
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware \
+  	kmod-usb3
+  IMAGE_SIZE := 30592k
+  IMAGES := sysupgrade.bin
+  KERNEL := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.bin := append-kernel | pad-to 128k | append-rootfs | pad-rootfs | check-size | append-metadata
+endef
+TARGET_DEVICES += tplink_tl-wr3002x
+
 define Device/tplink_tl-xdr-common
   DEVICE_VENDOR := TP-Link
   DEVICE_DTS_DIR := ../dts
@@ -3277,6 +3332,44 @@ define Device/wavlink_wl-wn536ax6-a
 endef
 TARGET_DEVICES += wavlink_wl-wn536ax6-a
 
+define Device/wavlink_wl-wn551x1b-common
+  DEVICE_VENDOR := WAVLINK
+  DEVICE_MODEL := WL-WN551X1B
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+endef
+
+define Device/wavlink_wl-wn551x1b
+  DEVICE_DTS := mt7981b-wavlink-wl-wn551x1b
+  IMAGE_SIZE := 65536k
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  $(call Device/wavlink_wl-wn551x1b-common)
+endef
+TARGET_DEVICES += wavlink_wl-wn551x1b
+
+define Device/wavlink_wl-wn551x1b-ubootmod
+  DEVICE_VARIANT := (OpenWrt U-Boot layout)
+  DEVICE_DTS := mt7981b-wavlink-wl-wn551x1b-ubootmod
+  UBOOTENV_IN_UBI := 1
+  IMAGES := sysupgrade.itb
+  KERNEL_INITRAMFS_SUFFIX := -recovery.itb
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.itb := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
+	append-metadata
+  ARTIFACTS := preloader.bin bl31-uboot.fip
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot wavlink_wl-wn551x1b
+  $(call Device/wavlink_wl-wn551x1b-common)
+endef
+TARGET_DEVICES += wavlink_wl-wn551x1b-ubootmod
+
 define Device/wavlink_wl-wn551x3
   DEVICE_VENDOR := WAVLINK
   DEVICE_MODEL := WL-WN551X3
@@ -3301,8 +3394,12 @@ define Device/wavlink_wl-wn586x3
   DEVICE_DTS := mt7981b-wavlink-wl-wn586x3
   DEVICE_DTS_DIR := ../dts
   DEVICE_DTS_LOADADDR := 0x47000000
-  IMAGE_SIZE := 15424k
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+  IMAGE_SIZE := 14336k
+  IMAGES := sysupgrade.bin
+  KERNEL := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  IMAGE/sysupgrade.bin := append-kernel | pad-to 128k | append-rootfs | pad-rootfs | check-size | append-metadata
 endef
 TARGET_DEVICES += wavlink_wl-wn586x3
 
