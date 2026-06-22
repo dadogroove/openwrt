@@ -27,6 +27,7 @@ acer,predator-w6x-ubootmod|\
 asus,zenwifi-bt8-ubootmod|\
 cmcc,a10-ubootmod|\
 comfast,cf-wr632ax-ubootmod|\
+comfast,cf-wr633ax-ubootmod|\
 creatlentem,clt-r30b1-ubi|\
 cudy,tr3000-v1-ubootmod|\
 cudy,wbr3000uax-v1-ubootmod|\
@@ -56,6 +57,7 @@ tplink,tl-xdr4288|\
 tplink,tl-xdr6086|\
 tplink,tl-xdr6088|\
 tplink,tl-xtr8488|\
+wavlink,wl-wn551x1b-ubootmod|\
 wavlink,wl-wnt100x3-ubootmod|\
 xiaomi,mi-router-ax3000t-ubootmod|\
 xiaomi,mi-router-wr30u-ubootmod|\
