@@ -48,7 +48,7 @@ define Device/OnhubImage
 	DEVICE_PACKAGES := ath10k-firmware-qca988x-ct e2fsprogs kmod-fs-ext4 losetup \
 			   partx-utils mkf2fs kmod-fs-f2fs \
 			   ucode kmod-google-firmware kmod-tpm-i2c-infineon \
-			   kmod-sound-soc-ipq8064-storm kmod-usb-storage \
+			   kmod-usb-storage \
 			   kmod-ramoops
 endef
 
