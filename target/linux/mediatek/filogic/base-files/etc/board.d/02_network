@@ -79,6 +79,7 @@ mediatek_setup_interfaces()
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" wan
 		;;
 	asus,tuf-ax4200|\
+	comfast,cf-wr633ax-ubootmod|\
 	iptime,ax3000sm|\
 	iptime,ax7800m-6e|\
 	jdcloud,re-cp-03|\
@@ -221,6 +222,7 @@ mediatek_setup_interfaces()
 		ucidef_set_interfaces_lan_wan "port1 port3 port4 port5 port6" "port2"
 		;;
 	tplink,tl-xdr6086|\
+	wavlink,wl-wn551x1b-ubootmod|\
 	wavlink,wl-wn551x3|\
 	wavlink,wl-wn586x3|\
 	wavlink,wl-wn586x3b)
