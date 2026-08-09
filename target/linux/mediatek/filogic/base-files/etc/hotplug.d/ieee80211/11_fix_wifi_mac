@@ -272,7 +272,8 @@ case "$board" in
 		addr=$(mtd_get_mac_binary "Factory" 0x4)
 		[ "$PHYNBR" = "1" ] && macaddr_setbit_la $(macaddr_setbit $addr 26) > /sys${DEVPATH}/macaddress
 		;;
-	wavlink,wl-wn573hx3)
+	wavlink,wl-wn573hx3|\
+	wavlink,wl-wn586x3)
 		addr=$(mtd_get_mac_binary factory 0x04)
 		[ "$PHYNBR" = "1" ] && macaddr_setbit_la $(macaddr_add $addr -0x300000) > /sys${DEVPATH}/macaddress
 		;;
