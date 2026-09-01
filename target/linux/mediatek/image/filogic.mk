@@ -818,7 +818,9 @@ define Device/bananapi_bpi-r4-pro-8x
   DEVICE_DTS_CONFIG := config-mt7988a-bananapi-bpi-r4-pro-8x
   DEVICE_BL2 := comb-4bg
   $(call Device/bananapi_bpi-r4-pro-common)
-  DEVICE_PACKAGES += kmod-phy-aeonsemi-as21xxx
+  DEVICE_PACKAGES += aeonsemi-as21xxx-firmware
+  DEVICE_DTS_OVERLAY += mt7988a-bananapi-bpi-r4-pro-8x-lan-phy mt7988a-bananapi-bpi-r4-pro-8x-lan-sfp \
+			mt7988a-bananapi-bpi-r4-pro-8x-wan-phy mt7988a-bananapi-bpi-r4-pro-8x-wan-sfp
 endef
 TARGET_DEVICES += bananapi_bpi-r4-pro-8x
 
@@ -2444,6 +2446,22 @@ define Device/livinet_li320
   SUPPORTED_DEVICES += mediatek,mt7981-spim-snand-gsw-rfb
 endef
 TARGET_DEVICES += livinet_li320
+
+define Device/ltc_vl7m19k
+  DEVICE_VENDOR := LTC
+  DEVICE_MODEL := Velo7 Max
+  DEVICE_ALT0_VENDOR := Tozed Kangwei
+  DEVICE_ALT0_MODEL := ZLT W19B6VM
+  DEVICE_DTS := mt7988a-ltc-vl7m19k
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7996-firmware kmod-phy-realtek kmod-usb3 \
+	mt7988-wo-firmware rtl826x-firmware
+  KERNEL = kernel-bin | lzma | \
+	fit-with-netgear-top-level-rootfs-node lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  SUPPORTED_DEVICES += mediatek,mt7988a-dsa-10g-spim-snand
+endef
+TARGET_DEVICES += ltc_vl7m19k
 
 define Device/mediatek_mt7981-rfb
   DEVICE_VENDOR := MediaTek

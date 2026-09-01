@@ -96,14 +96,17 @@ cudy,wr3000e-v1-ubootmod)
 	ucidef_set_led_netdev "wan" "wan" "blue:wan" "wan"
 	;;
 cudy,wr3000h-v1|\
-cudy,wr3000h-v1-ubootmod|\
-cudy,wr3000p-v1|\
-cudy,wr3000p-v1-ubootmod)
+cudy,wr3000h-v1-ubootmod)
 	ucidef_set_led_netdev "lan1" "lan1" "white:lan-1" "lan1" "link tx rx"
 	ucidef_set_led_netdev "lan2" "lan2" "white:lan-2" "lan2" "link tx rx"
 	ucidef_set_led_netdev "lan3" "lan3" "white:lan-3" "lan3" "link tx rx"
 	ucidef_set_led_netdev "lan4" "lan4" "white:lan-4" "lan4" "link tx rx"
 	ucidef_set_led_netdev "wan" "wan" "white:wan" "wan" "link tx rx"
+	ucidef_set_led_netdev "internet" "internet" "white:wan-online" "wan" "link"
+	;;
+cudy,wr3000p-v1|\
+cudy,wr3000p-v1-ubootmod)
+	ucidef_set_led_netdev "wan" "wan" "mdio-bus:06:white:wan" "wan" "link tx rx"
 	ucidef_set_led_netdev "internet" "internet" "white:wan-online" "wan" "link"
 	;;
 cudy,wr3000u-v1|\
@@ -170,6 +173,19 @@ livinet,li320)
 	ucidef_set_led_netdev "lan-3" "lan-3" "green:lan-3" "lan3" "link tx rx"
 	ucidef_set_led_netdev "wan-off" "wan-off" "red:wan" "wan" "link"
 	ucidef_set_led_netdev "wan" "wan" "green:wan" "wan" "link"
+	;;
+ltc,vl7m19k)
+	ucidef_set_led_netdev "lan0-green" "LAN0" "mt7530-0:00:green:lan" "lan0" "link_1000 tx rx"
+	ucidef_set_led_netdev "lan0-orange" "LAN0" "mt7530-0:00:orange:lan" "lan0" "link_10 link_100 tx rx"
+	ucidef_set_led_netdev "lan1-green" "LAN1" "mt7530-0:01:green:lan" "lan1" "link_1000 tx rx"
+	ucidef_set_led_netdev "lan1-orange" "LAN1" "mt7530-0:01:orange:lan" "lan1" "link_10 link_100 tx rx"
+	ucidef_set_led_netdev "lan2-green" "LAN2" "mt7530-0:02:green:lan" "lan2" "link_1000 tx rx"
+	ucidef_set_led_netdev "lan2-orange" "LAN2" "mt7530-0:02:orange:lan" "lan2" "link_10 link_100 tx rx"
+	ucidef_set_led_netdev "lan3-green" "LAN3" "mt7530-0:03:green:lan" "lan3" "link_1000 tx rx"
+	ucidef_set_led_netdev "lan3-orange" "LAN3" "mt7530-0:03:orange:lan" "lan3" "link_10 link_100 tx rx"
+	ucidef_set_led_netdev "wlan2g" "WLAN2G" "green:wlan-2ghz" "phy0.0-ap0" "link tx rx"
+	ucidef_set_led_netdev "wlan5g" "WLAN5G" "green:wlan-5ghz" "phy0.1-ap0" "link tx rx"
+	ucidef_set_led_netdev "wlan6g" "WLAN6G" "green:wlan-6ghz" "phy0.2-ap0" "link tx rx"
 	;;
 mercusys,mr80x-v3|\
 mercusys,mr85x|\
