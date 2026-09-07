@@ -3,10 +3,16 @@
 #include <net/dsa.h>
 #include <linux/etherdevice.h>
 #include <linux/if_bridge.h>
+#include <linux/if_vlan.h>
 #include <linux/pcs/pcs.h>
 #include <asm/mach-rtl-otto/mach-rtl-otto.h>
 
 #include "rtl-otto.h"
+
+/* Ethernet header, two stacked VLAN tags (802.1ad QinQ) and FCS */
+#define RTLDSA_FRAME_OVERHEAD		(ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN)
+/* Tail tag the DSA core adds to a frame on its way to the conduit */
+#define RTLDSA_TAG_OVERHEAD		4
 
 static const u8 ipv4_ll_mcast_addr_base[ETH_ALEN] = {
 	0x01, 0x00, 0x5e, 0x00, 0x00, 0x00
@@ -250,70 +256,36 @@ static int rtldsa_phylink_fill_available_pcs(struct phylink_config *config,
 					available_pcs, &num_available_pcs);
 }
 
-static void rtldsa_83xx_phylink_get_caps(struct dsa_switch *ds, int port,
-					 struct phylink_config *config)
+static void rtldsa_phylink_get_caps(struct dsa_switch *ds, int port,
+				    struct phylink_config *config)
 {
 	struct dsa_port *dp = dsa_to_port(ds, port);
+	struct rtl838x_switch_priv *priv = ds->priv;
+	unsigned long caps = priv->r->mac_capabilities;
 
-	/*
-	 * TODO: This needs to take into account the MAC to SERDES mapping and the
-	 * specific SoC capabilities. Right now we just assume all RTL83xx ports
-	 * support up to 1G standalone and QSGMII as that covers most real-world
-	 * use cases.
-	 */
-	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 | MAC_100 |
-				   MAC_1000FD;
-
-	__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_INTERNAL, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_QSGMII, config->supported_interfaces);
+	/* TODO: This needs to take into account the MAC to SERDES mapping */
+	config->mac_capabilities = caps;
+	if (caps & MAC_1000FD) {
+		__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
+		__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
+		__set_bit(PHY_INTERFACE_MODE_QSGMII, config->supported_interfaces);
+	}
+	if (caps & MAC_2500FD)
+		__set_bit(PHY_INTERFACE_MODE_2500BASEX, config->supported_interfaces);
+	if (caps & MAC_10000FD) {
+		__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
+		__set_bit(PHY_INTERFACE_MODE_USXGMII, config->supported_interfaces);
+		__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, config->supported_interfaces);
+	}
 
 	if (!fwnode_phylink_pcs_parse(of_fwnode_handle(dp->dn), NULL,
 				      &config->num_available_pcs)) {
 		config->fill_available_pcs = rtldsa_phylink_fill_available_pcs;
-		__set_bit(PHY_INTERFACE_MODE_SGMII, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_QSGMII, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->pcs_interfaces);
+		bitmap_copy(config->pcs_interfaces, config->supported_interfaces,
+			    PHY_INTERFACE_MODE_MAX);
 	}
-}
 
-static void rtldsa_93xx_phylink_get_caps(struct dsa_switch *ds, int port,
-					 struct phylink_config *config)
-{
-	struct dsa_port *dp = dsa_to_port(ds, port);
-
-	/*
-	 * TODO: This needs to take into account the MAC to SERDES mapping and the
-	 * specific SoC capabilities. Right now we just assume all RTL93xx ports
-	 * support up to 10G standalone and up to USXGMII as that covers most
-	 * real-world use cases.
-	 */
-	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 | MAC_100 |
-				   MAC_1000FD | MAC_2500FD | MAC_5000FD | MAC_10000FD;
-
-	__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
 	__set_bit(PHY_INTERFACE_MODE_INTERNAL, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_SGMII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_QSGMII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_10GBASER, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_2500BASEX, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_USXGMII, config->supported_interfaces);
-	__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, config->supported_interfaces);
-
-	if (!fwnode_phylink_pcs_parse(of_fwnode_handle(dp->dn), NULL,
-				      &config->num_available_pcs)) {
-		config->fill_available_pcs = rtldsa_phylink_fill_available_pcs;
-		__set_bit(PHY_INTERFACE_MODE_SGMII, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_QSGMII, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_1000BASEX, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_2500BASEX, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_USXGMII, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_10GBASER, config->pcs_interfaces);
-		__set_bit(PHY_INTERFACE_MODE_10G_QXGMII, config->pcs_interfaces);
-	}
 }
 
 static void rtldsa_83xx_phylink_mac_config(struct phylink_config *config,
@@ -1068,6 +1040,79 @@ static void rtldsa_port_disable(struct dsa_switch *ds, int port)
 	priv->r->traffic_set(port, 0);
 
 	priv->ports[port].enable = false;
+}
+
+static int rtldsa_port_max_mtu(struct dsa_switch *ds, int port)
+{
+	struct rtl838x_switch_priv *priv = ds->priv;
+
+	/* Families that cannot limit the frame length keep advertising the
+	 * ether_setup() default their ports always had.
+	 */
+	if (!priv->r->max_frame)
+		return ETH_DATA_LEN;
+
+	return priv->r->max_frame - RTLDSA_FRAME_OVERHEAD - RTLDSA_TAG_OVERHEAD;
+}
+
+static int rtldsa_largest_mtu(struct dsa_switch *ds, int port, int new_mtu)
+{
+	struct dsa_port *dp;
+	int mtu = new_mtu;
+
+	/* The MTU of the port being changed is written after this operation
+	 * runs, and not every user netdevice exists yet while probing.
+	 */
+	dsa_switch_for_each_user_port(dp, ds)
+		if (dp->index != port && dp->user)
+			mtu = max_t(int, mtu, dp->user->mtu);
+
+	return mtu;
+}
+
+static int rtldsa_port_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
+{
+	struct rtl838x_switch_priv *priv = ds->priv;
+	int frame_size;
+
+	if (!priv->r->max_frame)
+		return -EOPNOTSUPP;
+
+	/* The ethernet driver owns the limits of the CPU port and programs them
+	 * from the conduit MTU, which carries the tagger overhead that the DSA
+	 * core leaves out of the value handed here.
+	 */
+	if (dsa_is_cpu_port(ds, port))
+		return 0;
+
+	/* new_mtu is the L2 payload size, but the MAC limit counts the whole
+	 * frame: the Ethernet header, up to two stacked VLAN tags (802.1ad
+	 * QinQ) and the FCS. The MAC TAG_INC bit is left as found, so VLAN tag
+	 * bytes are not counted twice. The tail tag towards the CPU port takes
+	 * the place of the FCS and needs no room of its own.
+	 */
+	if (priv->r->mac_max_len_reg) {
+		frame_size = new_mtu + RTLDSA_FRAME_OVERHEAD;
+
+		sw_w32_mask(RTLDSA_MAC_MAX_LEN_MASK,
+			    RTLDSA_MAC_MAX_LEN_VAL(frame_size),
+			    priv->r->mac_max_len_reg(port));
+
+		return 0;
+	}
+
+	/* One register for all ports, so it has to fit the largest of them */
+	frame_size = rtldsa_largest_mtu(ds, port, new_mtu) + RTLDSA_FRAME_OVERHEAD;
+
+	sw_w32_mask(RTLDSA_MAC_MAX_LEN_MASK, RTLDSA_MAC_MAX_LEN_VAL(frame_size),
+		    priv->r->mac_max_len_ctrl);
+
+	if (priv->r->mac_max_len_ctrl_dup)
+		sw_w32_mask(RTLDSA_MAC_MAX_LEN_MASK,
+			    RTLDSA_MAC_MAX_LEN_VAL(frame_size),
+			    priv->r->mac_max_len_ctrl_dup);
+
+	return 0;
 }
 
 static bool rtldsa_support_eee(struct dsa_switch *ds, int port)
@@ -2619,7 +2664,7 @@ const struct dsa_switch_ops rtldsa_83xx_switch_ops = {
 	.get_tag_protocol	= rtldsa_get_tag_protocol,
 	.setup			= rtldsa_83xx_setup,
 
-	.phylink_get_caps	= rtldsa_83xx_phylink_get_caps,
+	.phylink_get_caps	= rtldsa_phylink_get_caps,
 
 	.get_strings		= rtldsa_get_strings,
 	.get_ethtool_stats	= rtldsa_get_ethtool_stats,
@@ -2633,6 +2678,9 @@ const struct dsa_switch_ops rtldsa_83xx_switch_ops = {
 
 	.port_enable		= rtldsa_port_enable,
 	.port_disable		= rtldsa_port_disable,
+
+	.port_change_mtu	= rtldsa_port_change_mtu,
+	.port_max_mtu		= rtldsa_port_max_mtu,
 
 	.support_eee		= rtldsa_support_eee,
 	.set_mac_eee		= rtldsa_set_mac_eee,
@@ -2678,7 +2726,7 @@ const struct dsa_switch_ops rtldsa_93xx_switch_ops = {
 	.get_tag_protocol	= rtldsa_get_tag_protocol,
 	.setup			= rtldsa_93xx_setup,
 
-	.phylink_get_caps	= rtldsa_93xx_phylink_get_caps,
+	.phylink_get_caps	= rtldsa_phylink_get_caps,
 
 	.get_strings		= rtldsa_get_strings,
 	.get_ethtool_stats	= rtldsa_get_ethtool_stats,
@@ -2692,6 +2740,9 @@ const struct dsa_switch_ops rtldsa_93xx_switch_ops = {
 
 	.port_enable		= rtldsa_port_enable,
 	.port_disable		= rtldsa_port_disable,
+
+	.port_change_mtu	= rtldsa_port_change_mtu,
+	.port_max_mtu		= rtldsa_port_max_mtu,
 
 	.support_eee		= rtldsa_support_eee,
 	.set_mac_eee		= rtldsa_set_mac_eee,

@@ -374,6 +374,11 @@ static inline int rtl931x_mac_port_ctrl(int p)
 	return RTL931X_MAC_L2_PORT_CTRL + (p << 7);
 }
 
+static inline int rtl931x_mac_max_len_reg(int p)
+{
+	return RTL931X_MAC_L2_PORT_MAX_LEN_CTRL + (p << 2);
+}
+
 static inline int rtl931x_l2_port_new_salrn(int p)
 {
 	return RTL931X_L2_PORT_NEW_SALRN(p);
@@ -1400,10 +1405,19 @@ static int rtl931x_pie_verify_template(struct rtl838x_switch_priv *priv,
 			return -1;
 	}
 
-	if (ether_addr_to_u64(pr->smac) && !rtl931x_pie_templ_has(t, TEMPLATE_FIELD_SMAC0))
+	if (ether_addr_to_u64(pr->smac_m) && !rtl931x_pie_templ_has(t, TEMPLATE_FIELD_SMAC0))
 		return -1;
 
-	if (ether_addr_to_u64(pr->dmac) && !rtl931x_pie_templ_has(t, TEMPLATE_FIELD_DMAC0))
+	if (ether_addr_to_u64(pr->dmac_m) && !rtl931x_pie_templ_has(t, TEMPLATE_FIELD_DMAC0))
+		return -1;
+
+	if (pr->itag_m && !rtl931x_pie_templ_has(t, TEMPLATE_FIELD_VLAN))
+		return -1;
+
+	if (pr->sport_m && !rtl931x_pie_templ_has(t, TEMPLATE_FIELD_L4_SPORT))
+		return -1;
+
+	if (pr->dport_m && !rtl931x_pie_templ_has(t, TEMPLATE_FIELD_L4_DPORT))
 		return -1;
 
 	/* TODO: Check more */
@@ -1445,7 +1459,7 @@ static int rtl931x_pie_rule_add(struct rtl838x_switch_priv *priv, struct pie_rul
 			break;
 	}
 
-	if (block >= priv->r->n_pie_blocks) {
+	if (block >= max_block) {
 		mutex_unlock(&priv->pie_mutex);
 		return -EOPNOTSUPP;
 	}
@@ -2024,6 +2038,10 @@ const struct rtldsa_config rtldsa_931x_cfg = {
 	.mac_force_mode_ctrl = rtl931x_mac_force_mode_ctrl,
 	.mac_link_sts = RTL931X_MAC_LINK_STS,
 	.mac_port_ctrl = rtl931x_mac_port_ctrl,
+	.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 | MAC_100 |
+			    MAC_1000FD | MAC_2500FD | MAC_5000FD | MAC_10000FD,
+	.mac_max_len_reg = rtl931x_mac_max_len_reg,
+	.max_frame = RTL931X_MAX_FRAME,
 	.l2_port_new_salrn = rtl931x_l2_port_new_salrn,
 	.l2_port_new_sa_fwd = rtl931x_l2_port_new_sa_fwd,
 	.get_mirror_config = rtldsa_931x_get_mirror_config,

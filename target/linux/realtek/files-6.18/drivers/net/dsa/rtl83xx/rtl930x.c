@@ -689,6 +689,11 @@ static inline int rtl930x_mac_port_ctrl(int p)
 	return RTL930X_MAC_L2_PORT_CTRL(p);
 }
 
+static inline int rtl930x_mac_max_len_reg(int p)
+{
+	return RTL930X_MAC_L2_PORT_MAX_LEN_CTRL(p);
+}
+
 static u64 rtl930x_l2_hash_seed(u64 mac, u32 vid)
 {
 	u64 v = vid;
@@ -1738,10 +1743,19 @@ static int rtl930x_pie_verify_template(struct rtl838x_switch_priv *priv,
 			return -1;
 	}
 
-	if (ether_addr_to_u64(pr->smac) && !rtl930x_pie_templ_has(t, TEMPLATE_FIELD_SMAC0))
+	if (ether_addr_to_u64(pr->smac_m) && !rtl930x_pie_templ_has(t, TEMPLATE_FIELD_SMAC0))
 		return -1;
 
-	if (ether_addr_to_u64(pr->dmac) && !rtl930x_pie_templ_has(t, TEMPLATE_FIELD_DMAC0))
+	if (ether_addr_to_u64(pr->dmac_m) && !rtl930x_pie_templ_has(t, TEMPLATE_FIELD_DMAC0))
+		return -1;
+
+	if (pr->itag_m && !rtl930x_pie_templ_has(t, TEMPLATE_FIELD_VLAN))
+		return -1;
+
+	if (pr->sport_m && !rtl930x_pie_templ_has(t, TEMPLATE_FIELD_L4_SPORT))
+		return -1;
+
+	if (pr->dport_m && !rtl930x_pie_templ_has(t, TEMPLATE_FIELD_L4_DPORT))
 		return -1;
 
 	/* TODO: Check more */
@@ -1782,7 +1796,7 @@ static int rtl930x_pie_rule_add(struct rtl838x_switch_priv *priv, struct pie_rul
 			break;
 	}
 
-	if (block >= priv->r->n_pie_blocks) {
+	if (block >= max_block) {
 		mutex_unlock(&priv->pie_mutex);
 		return -EOPNOTSUPP;
 	}
@@ -1899,6 +1913,12 @@ static void rtl930x_packet_cntr_clear(int counter)
 	struct table_reg *r = rtl_table_get(RTL9300_TBL_0, 3);
 
 	pr_debug("In %s, id %d\n", __func__, counter);
+
+	/* Two counters share one LOG table entry. Read the current entry
+	 * first so clearing one half preserves the adjacent counter.
+	 */
+	rtl_table_read(r, counter / 2);
+
 	/* The table has a size of 2 registers */
 	if (counter % 2)
 		sw_w32(0, rtl_table_data(r, 0));
@@ -2258,6 +2278,10 @@ const struct rtldsa_config rtldsa_930x_cfg = {
 	.mac_force_mode_mask = RTL930X_FORCE_EN | RTL930X_FORCE_LINK_EN,
 	.mac_force_mode_ctrl = rtl930x_mac_force_mode_ctrl,
 	.mac_port_ctrl = rtl930x_mac_port_ctrl,
+	.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE | MAC_10 | MAC_100 |
+			    MAC_1000FD | MAC_2500FD | MAC_5000FD | MAC_10000FD,
+	.mac_max_len_reg = rtl930x_mac_max_len_reg,
+	.max_frame = RTL930X_MAX_FRAME,
 	.l2_port_new_salrn = rtl930x_l2_port_new_salrn,
 	.l2_port_new_sa_fwd = rtl930x_l2_port_new_sa_fwd,
 	.get_mirror_config = rtldsa_930x_get_mirror_config,
