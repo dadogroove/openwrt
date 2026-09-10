@@ -15,6 +15,7 @@ static int rtl83xx_parse_flow_rule(struct rtl838x_switch_priv *priv,
 				   struct flow_rule *rule, struct rtl83xx_flow *flow)
 {
 	struct flow_dissector *dissector = rule->match.dissector;
+	u64 supported_keys;
 
 	pr_debug("In %s\n", __func__);
 	/* KEY_CONTROL and KEY_BASIC are needed for forming a meaningful key */
@@ -24,30 +25,64 @@ static int rtl83xx_parse_flow_rule(struct rtl838x_switch_priv *priv,
 		return -EOPNOTSUPP;
 	}
 
+	supported_keys = BIT_ULL(FLOW_DISSECTOR_KEY_CONTROL) |
+			 BIT_ULL(FLOW_DISSECTOR_KEY_BASIC) |
+			 BIT_ULL(FLOW_DISSECTOR_KEY_ETH_ADDRS) |
+			 BIT_ULL(FLOW_DISSECTOR_KEY_VLAN) |
+			 BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS) |
+			 BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+			 BIT_ULL(FLOW_DISSECTOR_KEY_PORTS);
+	if (dissector->used_keys & ~supported_keys) {
+		dev_err(priv->dev, "unsupported TC keys: used_keys = 0x%llx\n",
+			dissector->used_keys & ~supported_keys);
+		return -EOPNOTSUPP;
+	}
+
+	if ((dissector->used_keys & BIT_ULL(FLOW_DISSECTOR_KEY_IPV4_ADDRS)) &&
+	    (dissector->used_keys & BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS)))
+		return -EOPNOTSUPP;
+
 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
 		struct flow_match_basic match;
 
 		pr_debug("%s: BASIC\n", __func__);
 		flow_rule_match_basic(rule, &match);
-		if (match.key->n_proto == htons(ETH_P_ARP))
-			flow->rule.frame_type = 0;
-		if (match.key->n_proto == htons(ETH_P_IP))
-			flow->rule.frame_type = 2;
-		if (match.key->n_proto == htons(ETH_P_IPV6))
-			flow->rule.frame_type = 3;
-		if ((match.key->n_proto == htons(ETH_P_ARP)) || flow->rule.frame_type)
+		if (match.mask->n_proto) {
+			if (match.mask->n_proto != htons(0xffff))
+				return -EOPNOTSUPP;
+
+			if (match.key->n_proto == htons(ETH_P_ARP))
+				flow->rule.frame_type = 0;
+			else if (match.key->n_proto == htons(ETH_P_IP))
+				flow->rule.frame_type = 2;
+			else if (match.key->n_proto == htons(ETH_P_IPV6))
+				flow->rule.frame_type = 3;
+			else
+				return -EOPNOTSUPP;
 			flow->rule.frame_type_m = 3;
-		if (flow->rule.frame_type >= 2) {
-			if (match.key->ip_proto == IPPROTO_UDP)
+		}
+		if (match.mask->ip_proto) {
+			if (flow->rule.frame_type < 2 || match.mask->ip_proto != 0xff)
+				return -EOPNOTSUPP;
+
+			switch (match.key->ip_proto) {
+			case IPPROTO_UDP:
 				flow->rule.frame_type_l4 = 0;
-			if (match.key->ip_proto == IPPROTO_TCP)
+				break;
+			case IPPROTO_TCP:
 				flow->rule.frame_type_l4 = 1;
-			if (match.key->ip_proto == IPPROTO_ICMP || match.key->ip_proto == IPPROTO_ICMPV6)
+				break;
+			case IPPROTO_ICMP:
+			case IPPROTO_ICMPV6:
 				flow->rule.frame_type_l4 = 2;
-			if (match.key->ip_proto == IPPROTO_TCP)
+				break;
+			case IPPROTO_IGMP:
 				flow->rule.frame_type_l4 = 3;
-			if ((match.key->ip_proto == IPPROTO_UDP) || flow->rule.frame_type_l4)
-				flow->rule.frame_type_l4_m = 7;
+				break;
+			default:
+				return -EOPNOTSUPP;
+			}
+			flow->rule.frame_type_l4_m = 7;
 		}
 	}
 
@@ -67,9 +102,17 @@ static int rtl83xx_parse_flow_rule(struct rtl838x_switch_priv *priv,
 
 		pr_debug("%s: VLAN\n", __func__);
 		flow_rule_match_vlan(rule, &match);
+		if (match.mask->vlan_priority || match.mask->vlan_dei ||
+		    match.mask->vlan_eth_type)
+			return -EOPNOTSUPP;
+		/* cls_flower sets a full vlan_tpid mask for every VLAN-ethertype
+		 * rule; only reject a TPID the PIE cannot match on.
+		 */
+		if (match.mask->vlan_tpid &&
+		    match.key->vlan_tpid != htons(ETH_P_8021Q))
+			return -EOPNOTSUPP;
 		flow->rule.itag = match.key->vlan_id;
 		flow->rule.itag_m = match.mask->vlan_id;
-		/* TODO: What about match.key->vlan_priority? */
 	}
 
 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
@@ -117,6 +160,42 @@ static void rtl83xx_flow_bypass_all(struct rtl83xx_flow *flow)
 	flow->rule.bypass_ibc_sc = true;
 }
 
+static int rtldsa_validate_flow_actions(struct flow_rule *rule)
+{
+	const struct flow_action_entry *act;
+	bool drop = false, fwd = false;
+	int i, count = 0;
+
+	flow_action_for_each(i, act, &rule->action) {
+		count++;
+		switch (act->id) {
+		case FLOW_ACTION_DROP:
+			drop = true;
+			break;
+		case FLOW_ACTION_TRAP:
+		case FLOW_ACTION_REDIRECT:
+		case FLOW_ACTION_MIRRED:
+			if (fwd)
+				return -EOPNOTSUPP;
+			fwd = true;
+			break;
+		default:
+			/* FLOW_ACTION_VLAN_PUSH / _POP map to the ivid/ovid PIE
+			 * action fields via the translation in rtl83xx_add_flow(),
+			 * which predates this offload and has never been exercised
+			 * through it. Keep them - and every other action - rejected
+			 * until that path is reviewed.
+			 */
+			return -EOPNOTSUPP;
+		}
+	}
+
+	if (!count || (drop && count != 1))
+		return -EOPNOTSUPP;
+
+	return 0;
+}
+
 static int rtl83xx_parse_fwd(struct rtl838x_switch_priv *priv,
 			     const struct flow_action_entry *act, struct rtl83xx_flow *flow)
 {
@@ -146,7 +225,20 @@ static int rtl83xx_add_flow(struct rtl838x_switch_priv *priv, struct flow_cls_of
 
 	pr_debug("%s\n", __func__);
 
-	rtl83xx_parse_flow_rule(priv, rule, flow);
+	if (flow_rule_match_has_control_flags(rule, f->common.extack))
+		return -EOPNOTSUPP;
+
+	if (!flow_action_hw_stats_check(&rule->action, f->common.extack,
+					FLOW_ACTION_HW_STATS_IMMEDIATE_BIT))
+		return -EOPNOTSUPP;
+
+	err = rtldsa_validate_flow_actions(rule);
+	if (err)
+		return err;
+
+	err = rtl83xx_parse_flow_rule(priv, rule, flow);
+	if (err)
+		return err;
 
 	flow_action_for_each(i, act, &rule->action) {
 		switch (act->id) {
@@ -231,48 +323,127 @@ static const struct rhashtable_params tc_ht_params = {
 	.automatic_shrinking = true,
 };
 
-static int rtl83xx_configure_flower(struct rtl838x_switch_priv *priv,
-				    struct flow_cls_offload *f)
+int rtldsa_tc_init(struct rtl838x_switch_priv *priv)
+{
+	int err;
+
+	if (priv->tc_initialized)
+		return 0;
+
+	err = rhashtable_init(&priv->tc_ht, &tc_ht_params);
+	if (err)
+		return err;
+
+	mutex_init(&priv->tc_flow_lock);
+	priv->tc_initialized = true;
+
+	return 0;
+}
+
+/* Zero the hardware LOG counter and hand its allocator slot back. Done
+ * together so a slot is never returned to rtldsa_packet_cntr_alloc() while
+ * the hardware entry still holds the previous flow's count.
+ */
+static void rtldsa_packet_cntr_release(struct rtl838x_switch_priv *priv, int counter)
+{
+	if (counter < 0)
+		return;
+
+	if (priv->r->packet_cntr_clear) {
+		mutex_lock(&priv->reg_mutex);
+		priv->r->packet_cntr_clear(priv, counter);
+		mutex_unlock(&priv->reg_mutex);
+	}
+
+	rtldsa_packet_cntr_free(priv, counter);
+}
+
+static void rtldsa_tc_flow_free(void *ptr, void *arg)
+{
+	struct rtl83xx_flow *flow = ptr;
+	struct rtl838x_switch_priv *priv = arg;
+
+	priv->r->pie_rule_rm(priv, &flow->rule);
+	rtldsa_packet_cntr_release(priv, flow->rule.packet_cntr);
+
+	/* Readers may still hold an RCU-protected reference after the
+	 * object has been removed from the hash table.
+	 */
+	kfree_rcu(flow, rcu_head);
+}
+
+void rtldsa_tc_cleanup(struct rtl838x_switch_priv *priv)
+{
+	if (!priv->tc_initialized)
+		return;
+
+	/* Hold tc_flow_lock like the add/del/stats callbacks do: any
+	 * callback that slipped in before teardown must finish before the
+	 * table and rules are torn down, otherwise it can walk a half-freed
+	 * flow or run pie_rule_rm() against a rule this path already removed.
+	 */
+	mutex_lock(&priv->tc_flow_lock);
+	rhashtable_free_and_destroy(&priv->tc_ht, rtldsa_tc_flow_free, priv);
+	priv->tc_initialized = false;
+	mutex_unlock(&priv->tc_flow_lock);
+
+	rcu_barrier();
+	mutex_destroy(&priv->tc_flow_lock);
+}
+
+static int rtldsa_configure_flower(struct rtl838x_switch_priv *priv,
+				   struct flow_cls_offload *f)
 {
 	struct rtl83xx_flow *flow;
 	int err = 0;
 
 	pr_debug("In %s\n", __func__);
 
+	mutex_lock(&priv->tc_flow_lock);
+
+	/* rtldsa_tc_cleanup() clears this under the lock before it destroys
+	 * tc_ht; a callback that was parked on the lock must bail rather than
+	 * walk the freed table.
+	 */
+	if (!priv->tc_initialized) {
+		err = -ENODEV;
+		goto out_unlock;
+	}
+
 	rcu_read_lock();
 	pr_debug("Cookie %08lx\n", f->cookie);
 	flow = rhashtable_lookup(&priv->tc_ht, &f->cookie, tc_ht_params);
+	rcu_read_unlock();
 	if (flow) {
 		pr_info("%s: Got flow\n", __func__);
 		err = -EEXIST;
-		goto rcu_unlock;
+		goto out_unlock;
 	}
-
-rcu_unlock:
-	rcu_read_unlock();
-	if (flow)
-		goto out;
 	pr_debug("%s: New flow\n", __func__);
 
 	flow = kzalloc(sizeof(*flow), GFP_KERNEL);
 	if (!flow) {
 		err = -ENOMEM;
-		goto out;
+		goto out_unlock;
 	}
 
 	flow->cookie = f->cookie;
 	flow->priv = priv;
+	/* kzalloc() leaves this at 0, a valid counter id; -1 means "none". */
+	flow->rule.packet_cntr = -1;
 
 	err = rhashtable_insert_fast(&priv->tc_ht, &flow->node, tc_ht_params);
 	if (err) {
-		pr_err("Could not insert add new rule\n");
+		dev_err(priv->dev, "could not insert new rule\n");
 		goto out_free;
 	}
 
-	rtl83xx_add_flow(priv, f, flow); /* TODO: check error */
+	err = rtl83xx_add_flow(priv, f, flow);
+	if (err)
+		goto out_remove;
 
 	/* Add log action to flow */
-	flow->rule.packet_cntr = rtl83xx_packet_cntr_alloc(priv);
+	flow->rule.packet_cntr = rtldsa_packet_cntr_alloc(priv);
 	if (flow->rule.packet_cntr >= 0) {
 		pr_debug("Using packet counter %d\n", flow->rule.packet_cntr);
 		flow->rule.log_sel = true;
@@ -280,66 +451,115 @@ rcu_unlock:
 	}
 
 	err = priv->r->pie_rule_add(priv, &flow->rule);
-	return err;
+	if (err)
+		goto out_remove;
 
+	mutex_unlock(&priv->tc_flow_lock);
+	return 0;
+
+out_remove:
+	rhashtable_remove_fast(&priv->tc_ht, &flow->node, tc_ht_params);
+	rtldsa_packet_cntr_release(priv, flow->rule.packet_cntr);
+	/* published in tc_ht above; a concurrent reader may still hold a ref */
+	kfree_rcu(flow, rcu_head);
+	goto out_err;
 out_free:
 	kfree(flow);
-out:
+out_err:
 	pr_err("%s: error %d\n", __func__, err);
+out_unlock:
+	mutex_unlock(&priv->tc_flow_lock);
 
 	return err;
 }
 
-static int rtl83xx_delete_flower(struct rtl838x_switch_priv *priv,
-				 struct flow_cls_offload *cls_flower)
+static int rtldsa_delete_flower(struct rtl838x_switch_priv *priv,
+				struct flow_cls_offload *cls_flower)
 {
 	struct rtl83xx_flow *flow;
 	int err;
 
 	pr_debug("In %s\n", __func__);
+
+	mutex_lock(&priv->tc_flow_lock);
+
+	/* see rtldsa_configure_flower(): bail if teardown already ran */
+	if (!priv->tc_initialized) {
+		err = -ENODEV;
+		goto out_unlock;
+	}
+
 	rcu_read_lock();
 	flow = rhashtable_lookup_fast(&priv->tc_ht, &cls_flower->cookie, tc_ht_params);
 	if (!flow) {
 		rcu_read_unlock();
-		return -ENOENT;
+		err = -ENOENT;
+		goto out_unlock;
 	}
 
 	err = rhashtable_remove_fast(&priv->tc_ht, &flow->node, tc_ht_params);
 	rcu_read_unlock();
 	if (err)
-		return err;
+		goto out_unlock;
 
 	priv->r->pie_rule_rm(priv, &flow->rule);
+	rtldsa_packet_cntr_release(priv, flow->rule.packet_cntr);
 
 	kfree_rcu(flow, rcu_head);
 
-	return 0;
+out_unlock:
+	mutex_unlock(&priv->tc_flow_lock);
+
+	return err;
 }
 
-static int rtl83xx_stats_flower(struct rtl838x_switch_priv *priv,
-				struct flow_cls_offload *cls_flower)
+static int rtldsa_stats_flower(struct rtl838x_switch_priv *priv,
+			       struct flow_cls_offload *cls_flower)
 {
 	struct rtl83xx_flow *flow;
 	unsigned long lastused = 0;
-	int total_packets, new_packets;
+	u32 total_packets, new_packets = 0;
+	int err = 0;
 
 	pr_debug("%s:\n", __func__);
-	flow = rhashtable_lookup_fast(&priv->tc_ht, &cls_flower->cookie, tc_ht_params);
-	if (!flow)
-		return -1;
 
+	mutex_lock(&priv->tc_flow_lock);
+
+	/* see rtldsa_configure_flower(): bail if teardown already ran */
+	if (!priv->tc_initialized) {
+		err = -ENODEV;
+		goto out_unlock;
+	}
+
+	rcu_read_lock();
+	flow = rhashtable_lookup_fast(&priv->tc_ht, &cls_flower->cookie, tc_ht_params);
+	rcu_read_unlock();
+	if (!flow) {
+		err = -ENOENT;
+		goto out_unlock;
+	}
+
+	/* tc_flow_lock keeps the flow alive for the duration of the sleeping
+	 * counter read, so it is safe to dereference it after the RCU lock.
+	 */
 	if (flow->rule.packet_cntr >= 0) {
-		total_packets = priv->r->packet_cntr_read(flow->rule.packet_cntr);
-		pr_debug("Total packets: %d\n", total_packets);
+		mutex_lock(&priv->reg_mutex);
+		total_packets = priv->r->packet_cntr_read(priv, flow->rule.packet_cntr);
+		mutex_unlock(&priv->reg_mutex);
+		dev_dbg(priv->dev, "total packets: %u\n", total_packets);
+
 		new_packets = total_packets - flow->rule.last_packet_cnt;
 		flow->rule.last_packet_cnt = total_packets;
 	}
 
-	/* TODO: We need a second PIE rule to count the bytes */
-	flow_stats_update(&cls_flower->stats, 100 * new_packets, new_packets, 0, lastused,
+	/* We have no byte counter, report packets only */
+	flow_stats_update(&cls_flower->stats, 0, new_packets, 0, lastused,
 			  FLOW_ACTION_HW_STATS_IMMEDIATE);
 
-	return 0;
+out_unlock:
+	mutex_unlock(&priv->tc_flow_lock);
+
+	return err;
 }
 
 static int rtl83xx_setup_tc_cls_flower(struct rtl838x_switch_priv *priv,
@@ -348,11 +568,11 @@ static int rtl83xx_setup_tc_cls_flower(struct rtl838x_switch_priv *priv,
 	pr_debug("%s: %d\n", __func__, cls_flower->command);
 	switch (cls_flower->command) {
 	case FLOW_CLS_REPLACE:
-		return rtl83xx_configure_flower(priv, cls_flower);
+		return rtldsa_configure_flower(priv, cls_flower);
 	case FLOW_CLS_DESTROY:
-		return rtl83xx_delete_flower(priv, cls_flower);
+		return rtldsa_delete_flower(priv, cls_flower);
 	case FLOW_CLS_STATS:
-		return rtl83xx_stats_flower(priv, cls_flower);
+		return rtldsa_stats_flower(priv, cls_flower);
 	default:
 		return -EOPNOTSUPP;
 	}
@@ -378,8 +598,6 @@ int rtl83xx_setup_tc(struct net_device *dev, enum tc_setup_type type, void *type
 {
 	struct rtl838x_switch_priv *priv;
 	struct flow_block_offload *f = type_data;
-	static bool first_time = true;
-	int err;
 
 	pr_debug("%s: %d\n", __func__, type);
 
@@ -391,13 +609,9 @@ int rtl83xx_setup_tc(struct net_device *dev, enum tc_setup_type type, void *type
 
 	switch (type) {
 	case TC_SETUP_BLOCK:
-		if (first_time) {
-			first_time = false;
-			err = rhashtable_init(&priv->tc_ht, &tc_ht_params);
-			if (err)
-				pr_err("%s: Could not initialize hash table\n", __func__);
-		}
-
+		/* tc_ht is set up for the switch's lifetime in
+		 * rtldsa_93xx_setup(); nothing to do here.
+		 */
 		f->unlocked_driver_cb = true;
 		return flow_block_cb_setup_simple(type_data,
 						  &rtl83xx_block_cb_list,
