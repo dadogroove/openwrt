@@ -3789,7 +3789,7 @@ define Device/wavlink_wl-wn586x3
   DEVICE_DTS_DIR := ../dts
   DEVICE_DTS_LOADADDR := 0x47000000
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
-  IMAGE_SIZE := 14336k  
+  IMAGE_SIZE := 14336k
   IMAGES := sysupgrade.bin
   KERNEL := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
