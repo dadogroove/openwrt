@@ -15,7 +15,7 @@ Signed-off-by: Mantas Pucka <mantas@8devices.com>
 
 --- a/arch/arm64/boot/dts/qcom/ipq6018.dtsi
 +++ b/arch/arm64/boot/dts/qcom/ipq6018.dtsi
-@@ -817,6 +817,102 @@
+@@ -828,6 +828,102 @@
  			};
  		};
  
@@ -116,5 +116,5 @@ Signed-off-by: Mantas Pucka <mantas@8devices.com>
 +		};
 +
  		q6v5_wcss: remoteproc@cd00000 {
- 			compatible = "qcom,ipq6018-wcss-pil";
+ 			compatible = "qcom,ipq6018-wcss-sec-pil";
  			reg = <0x0 0x0cd00000 0x0 0x4040>,
