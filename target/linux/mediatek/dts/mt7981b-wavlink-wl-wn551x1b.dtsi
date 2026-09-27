@@ -52,14 +52,14 @@
 		led-2 {
 			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_LAN;
-			function-enumerator = <1>;
+			function-enumerator = <2>;
 			gpios = <&pio 9 GPIO_ACTIVE_LOW>;
 		};
 
 		led-3 {
 			color = <LED_COLOR_ID_GREEN>;
 			function = LED_FUNCTION_LAN;
-			function-enumerator = <2>;
+			function-enumerator = <1>;
 			gpios = <&pio 10 GPIO_ACTIVE_LOW>;
 		};
 
@@ -217,12 +217,12 @@
 
         port@1 {
 			reg = <1>;
-			label = "lan1";
+			label = "lan2";
 		};
 
 		port@2 {
 			reg = <2>;
-			label = "lan2";
+			label = "lan1";
 		};
 
 		port@6 {
