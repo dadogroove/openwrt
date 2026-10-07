@@ -1,4 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
+/*
+ * Copyright (C) 2026 Gennaro Cimmino <gcimmino@rayonra.net>
+ * Assisted-by: Claude:claude-opus-5, Claude:claude-opus-5-5
+ */
 
 #ifndef _OTTO_L3_H
 #define _OTTO_L3_H
@@ -88,8 +92,7 @@ struct otto_l3_route {
 	unsigned int members;		/* FIB entries a trap row stands for */
 	struct list_head srcs;		/* source-specific routes a trap row stands for */
 	bool srcs_incomplete;		/* a source could not be tracked */
-	struct rhlist_head linkage;
-	struct list_head list;		/* all routes, for lookups by destination */
+	struct list_head list;		/* all routes, for every lookup */
 	u32 tb_id;			/* routing table the route came from */
 	u16 switch_mac_id;		/* Index into switch's own MACs, RTL839X only */
 	struct otto_l3_nexthop nh;
@@ -131,11 +134,11 @@ struct otto_l3_ctrl {
 	struct delayed_work resync_work;
 	unsigned int resync_delay;
 	bool resync_wanted;
-	struct rhltable routes;
 	struct list_head routes_list;
 	unsigned long route_use_bm[MAX_ROUTES / 32];
 	unsigned long host_route_use_bm[MAX_HOST_ROUTES / 32];
 	struct otto_l3_intf interfaces[MAX_SMACS];
+	unsigned int intf_refs[MAX_SMACS];	/* routes holding each */
 	bool prefix_rows_stale;	/* a move failed, the rows are not where we say */
 	bool v4_fwd_off;	/* policy rules keep IPv4 forwarding in software */
 	bool v6_fwd_off;	/* policy rules keep IPv6 forwarding in software */
