@@ -174,6 +174,7 @@ platform_do_upgrade() {
 	bazis,ax3000wm|\
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
+	comfast,cf-wa933-ubi|\
 	comfast,cf-wr632ax-ubi|\
 	comfast,cf-wr632ax-ubootmod|\
 	comfast,cf-wr633ax-ubootmod|\
@@ -434,6 +435,7 @@ platform_check_image() {
 	bazis,ax3000wm|\
 	cmcc,a10-ubootmod|\
 	cmcc,rax3000m|\
+	comfast,cf-wa933-ubi|\
 	comfast,cf-wr632ax-ubi|\
 	comfast,cf-wr632ax-ubootmod|\
 	comfast,cf-wr633ax-ubootmod|\

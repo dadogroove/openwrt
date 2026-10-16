@@ -9,9 +9,9 @@ define Build/mstc-header
 		printf "CMOC"; \
 		tail -c+5 $@.crclen; head -c4 $@.crclen; \
 		printf '$(call toupper,$(LINUX_KARCH)) $(VERSION_DIST) Linux-$(LINUX_VERSION)' | \
-			dd bs=64 count=1 conv=sync 2>/dev/null; \
+			dd bs=64 count=1 conv=sync iflag=fullblock 2>/dev/null; \
 		printf "$(version)" | \
-			dd bs=64 count=1 conv=sync 2>/dev/null; \
+			dd bs=64 count=1 conv=sync iflag=fullblock 2>/dev/null; \
 		dd if=/dev/zero bs=$$(($(hdrlen) - 0x8c)) count=1 2>/dev/null; \
 		cat $@; \
 	) > $@.new
@@ -408,6 +408,35 @@ define Device/xiaomi_redmi-ax5400
 		ipq-wifi-xiaomi_redmi-ax5400
 endef
 TARGET_DEVICES += xiaomi_redmi-ax5400
+
+define Device/xunison_exigo-hub-d50-5g
+	$(call Device/FitImage)
+	DEVICE_VENDOR := Xunison
+	DEVICE_MODEL := Exigo Hub D50 5G
+	DEVICE_ALT0_VENDOR := Zearts
+	DEVICE_ALT0_MODEL := D50 5G
+	SOC := ipq5018
+	KERNEL_IN_UBI := 1
+	BLOCKSIZE := 128k
+	PAGESIZE := 2048
+	SUBPAGESIZE := 2048
+	VID_HDR_OFFSET := 2048
+	NAND_SIZE := 128m
+	IMAGE_SIZE := 59392k
+	DEVICE_DTS_CONFIG := config@mp03.1
+	IMAGES := factory.img sysupgrade.bin
+	IMAGE/factory.img := append-ubi | check-size
+	DEVICE_PACKAGES := ath11k-firmware-ipq5018 \
+		kmod-ath11k-pci \
+		ath11k-firmware-qcn9074 \
+		ipq-wifi-xunison_exigo-hub-d50-5g \
+		kmod-ledtrig-network \
+		kmod-mhi-pci-generic \
+		kmod-mhi-wwan-ctrl \
+		kmod-mhi-wwan-mbim \
+		umbim
+endef
+TARGET_DEVICES += xunison_exigo-hub-d50-5g
 
 define Device/yuncore_ax830
 	$(call Device/FitImage)
