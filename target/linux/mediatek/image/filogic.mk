@@ -1254,9 +1254,25 @@ define Device/comfast_cf-wr633ax
 endef
 TARGET_DEVICES += comfast_cf-wr633ax
 
+define Device/comfast_cf-wr633ax-ubi
+  DEVICE_VARIANT := (UBI)
+  DEVICE_DTS := mt7981a-comfast-cf-wr633ax-ubi
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ubi-ddr3-1866
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot comfast_cf-wr633ax-ubi
+  $(call Device/comfast_cf-wr633ax-ubootmod-common)
+endef
+TARGET_DEVICES += comfast_cf-wr633ax-ubi
+
 define Device/comfast_cf-wr633ax-ubootmod
   DEVICE_VARIANT := (OpenWrt U-Boot layout)
   DEVICE_DTS := mt7981a-comfast-cf-wr633ax-ubootmod
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot comfast_cf-wr633ax
+  $(call Device/comfast_cf-wr633ax-ubootmod-common)
+endef
+TARGET_DEVICES += comfast_cf-wr633ax-ubootmod
+
+define Device/comfast_cf-wr633ax-ubootmod-common
   UBOOTENV_IN_UBI := 1
   IMAGES := sysupgrade.itb
   KERNEL_INITRAMFS_SUFFIX := -recovery.itb
@@ -1266,11 +1282,8 @@ define Device/comfast_cf-wr633ax-ubootmod
   IMAGE/sysupgrade.itb := append-kernel | \
 	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | append-metadata
   ARTIFACTS := preloader.bin bl31-uboot.fip
-  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
-  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot comfast_cf-wr633ax
   $(call Device/comfast_cf-wr633ax-common)
 endef
-TARGET_DEVICES += comfast_cf-wr633ax-ubootmod
 
 define Device/comfast_cf-xr186
   DEVICE_VENDOR := COMFAST
@@ -4036,9 +4049,25 @@ define Device/wavlink_wl-wn551x1b
 endef
 TARGET_DEVICES += wavlink_wl-wn551x1b
 
+define Device/wavlink_wl-wn551x1b-ubi
+  DEVICE_VARIANT := (UBI)
+  DEVICE_DTS := mt7981b-wavlink-wl-wn551x1b-ubi
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ubi-ddr3-1866
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot wavlink_wl-wn551x1b-ubi
+  $(call Device/wavlink_wl-wn551x1b-ubootmod-common)
+endef
+TARGET_DEVICES += wavlink_wl-wn551x1b-ubi
+
 define Device/wavlink_wl-wn551x1b-ubootmod
   DEVICE_VARIANT := (OpenWrt U-Boot layout)
   DEVICE_DTS := mt7981b-wavlink-wl-wn551x1b-ubootmod
+  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3-1866
+  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot wavlink_wl-wn551x1b
+  $(call Device/wavlink_wl-wn551x1b-ubootmod-common)
+endef
+TARGET_DEVICES += wavlink_wl-wn551x1b-ubootmod
+
+define Device/wavlink_wl-wn551x1b-ubootmod-common
   UBOOTENV_IN_UBI := 1
   IMAGES := sysupgrade.itb
   KERNEL_INITRAMFS_SUFFIX := -recovery.itb
@@ -4046,14 +4075,10 @@ define Device/wavlink_wl-wn551x1b-ubootmod
   KERNEL_INITRAMFS := kernel-bin | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
   IMAGE/sysupgrade.itb := append-kernel | \
-	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
-	append-metadata
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | append-metadata
   ARTIFACTS := preloader.bin bl31-uboot.fip
-  ARTIFACT/preloader.bin := mt7981-bl2 spim-nand-ddr3
-  ARTIFACT/bl31-uboot.fip := mt7981-bl31-uboot wavlink_wl-wn551x1b
   $(call Device/wavlink_wl-wn551x1b-common)
 endef
-TARGET_DEVICES += wavlink_wl-wn551x1b-ubootmod
 
 define Device/wavlink_wl-wn551x3
   DEVICE_VENDOR := WAVLINK
