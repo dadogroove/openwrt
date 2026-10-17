@@ -2,10 +2,10 @@
 
 /dts-v1/;
 
-#include "mt7981b-wavlink-wl-wn551x1b.dtsi"
+#include "mt7981b-wavlink-wl-wn551x1b-common.dtsi"
 
 / {
-	mmodel = "WAVLINK WL-WN551X1 Rev B";
+	model = "WAVLINK WL-WN551X1B";
 	compatible = "wavlink,wl-wn551x1b", "mediatek,mt7981b";
 };
 

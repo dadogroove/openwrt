@@ -2,10 +2,10 @@
 
 /dts-v1/;
 
-#include "mt7981b-wavlink-wl-wn551x1b.dtsi"
+#include "mt7981b-wavlink-wl-wn551x1b-common.dtsi"
 
 / {
-	model = "WAVLINK WL-WN551X1 Rev B (OpenWrt U-Boot layout)";
+	model = "WAVLINK WL-WN551X1B (OpenWrt U-Boot layout)";
 	compatible = "wavlink,wl-wn551x1b-ubootmod", "mediatek,mt7981b";
 };
 
