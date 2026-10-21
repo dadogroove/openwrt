@@ -81,8 +81,10 @@
 };
 
 &eth {
+
 	pinctrl-names = "default";
 	pinctrl-0 = <&mdio_pins>;
+
 	status = "okay";
 
 	gmac0: mac@0 {
@@ -186,9 +188,14 @@
 			partition@f0000 {
 				compatible = "denx,fit";
 				label = "firmware";
-				reg = <0x180000 0xe80000>;
+				reg = <0x180000 0xe00000>;
 			};
 
+			partition@f80000 {
+				label = "hw";
+				reg = <0xf80000 0x80000>;
+
+			};
 		};
 	};
 };
