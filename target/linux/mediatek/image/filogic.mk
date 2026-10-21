@@ -4113,6 +4113,21 @@ define Device/wavlink_wl-wn586x3
 endef
 TARGET_DEVICES += wavlink_wl-wn586x3
 
+define Device/wavlink_wl-wn586x3-no-hw
+  DEVICE_VENDOR := WAVLINK
+  DEVICE_MODEL := WL-WN586X3 (no hw)
+  DEVICE_DTS := mt7981b-wavlink-wl-wn586x3-no-hw
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_DTS_LOADADDR := 0x47000000
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+  IMAGE_SIZE := 14336k
+  IMAGES := sysupgrade.bin
+  KERNEL := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  IMAGE/sysupgrade.bin := append-kernel | pad-to 128k | append-rootfs | pad-rootfs | check-size | append-metadata
+endef
+TARGET_DEVICES += wavlink_wl-wn586x3-no-hw
+
 define Device/wavlink_wl-wn586x3b
   DEVICE_VENDOR := WAVLINK
   DEVICE_MODEL := WL-WN586X3B
