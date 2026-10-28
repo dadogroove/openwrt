@@ -1636,6 +1636,7 @@ UBOOT_TARGETS := \
 	mt7986_tplink_tl-xdr6088 \
 	mt7986_tplink_tl-xtr8488 \
 	mt7986_xiaomi_redmi-router-ax6000 \
+	mt7986_zyxel_ex5512-t0 \
 	mt7986_zyxel_ex5601-t0 \
 	mt7986_zyxel_wx5600-t0 \
 	mt7986_rfb \
