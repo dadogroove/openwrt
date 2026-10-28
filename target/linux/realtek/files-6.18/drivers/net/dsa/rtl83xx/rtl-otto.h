@@ -81,6 +81,14 @@ struct rtldsa_93xx_lag_entry {
 	u32 num_tx_candi:4;
 };
 
+struct rtldsa_tbf {
+	u32 handle;
+	u64 rate_bytes_ps;
+	u32 burst;
+	bool child;
+	bool offloaded;
+};
+
 struct rtldsa_port {
 	bool enable:1;
 	bool phy:1;
@@ -94,6 +102,8 @@ struct rtldsa_port {
 	u16 ets_children;
 	bool ets_offloadable;
 	u8 ets_weights[MAX_PRIOS];
+	struct rtldsa_tbf tbf;
+	struct rtldsa_tbf queue_tbf[MAX_PRIOS];
 	unsigned long cached_flags;
 	u64 pm;
 	u16 pvid;
@@ -201,7 +211,7 @@ struct pie_rule {
 	bool itag_fmt;		/* 0: inner tag packet, 1: inner priority tag or untagged */
 	bool otag_exist;	/* packet with outer tag */
 	bool itag_exist;	/* packet with inner tag */
-	bool frame_type_l2;	/* 0: Ethernet, 1: LLC_SNAP, 2: LLC_Other, 3: Reserved */
+	u8 frame_type_l2;	/* 0: Ethernet, 1: LLC_SNAP, 2: LLC_Other, 3: Reserved */
 	bool igr_normal_port;	/* Ingress port is not cpu or stacking port */
 	u8 tid;			/* The template ID defining the what the templated fields mean */
 
@@ -219,7 +229,7 @@ struct pie_rule {
 	bool itag_fmt_m;
 	bool otag_exist_m;
 	bool itag_exist_m;
-	bool frame_type_l2_m;
+	u8 frame_type_l2_m;
 	bool igr_normal_port_m;
 	u8 tid_m;
 
@@ -495,6 +505,8 @@ struct rtldsa_config {
 	int (*set_egress_rate)(struct otto_dsa_priv *priv, int port, u32 rate);
 	void (*queue_sched_set)(struct otto_dsa_priv *priv, int port, int queue, u32 weight,
 				bool strict);
+	int (*egress_shaper_set)(struct otto_dsa_priv *priv, int port, int queue,
+				 u64 rate_bytes_ps, u32 burst);
 	void (*qos_init)(struct otto_dsa_priv *priv);
 	int (*trk_mbr_ctr)(int group);
 	void (*lag_switch_init)(struct otto_dsa_priv *priv);
@@ -526,7 +538,9 @@ struct otto_dsa_priv {
 	struct regmap *map;
 	struct mutex reg_mutex;		/* Mutex for individual register manipulations */
 	struct mutex pie_mutex;		/* Mutex for Packet Inspection Engine */
+	u32 pie_failed_blocks;		/* RTL930x blocks disabled after failed rollback */
 	int link_state_irq;
+	bool link_state_irq_requested;
 	int mirror_group_ports[4];
 	int mirror_group_flower[4];	/* flower rules mirroring through each group */
 	const struct rtldsa_config *r;
@@ -611,7 +625,7 @@ void rtldsa_838x_print_matrix(void);
 
 /* RTL839x-specific */
 u32 rtl839x_hash(struct otto_dsa_priv *priv, u64 seed);
-void rtl839x_exec_tbl2_cmd(u32 cmd);
+void rtl839x_exec_tbl2_cmd(struct otto_dsa_priv *priv, u32 cmd);
 void rtldsa_839x_print_matrix(void);
 
 /* RTL930x-specific */
