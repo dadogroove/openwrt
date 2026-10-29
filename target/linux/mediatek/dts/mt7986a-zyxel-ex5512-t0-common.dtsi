@@ -28,15 +28,6 @@
         device_type = "memory";
 	};
 
-    reg_1p8v: regulator-1p8v {
-		compatible = "regulator-fixed";
-		regulator-name = "fixed-1.8V";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-boot-on;
-		regulator-always-on;
-	};
-
 	reg_3p3v: regulator-3p3v {
 		compatible = "regulator-fixed";
 		regulator-name = "fixed-3.3V";
@@ -65,11 +56,6 @@
 			linux,code = <KEY_RESTART>;
 		};
 
-		wlan-button {
-			label = "wlan";
-			gpios = <&pio 11 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_WLAN>;
-		};
 		wps-button {
 			label = "wps";
 			gpios = <&pio 56 GPIO_ACTIVE_LOW>;
@@ -333,20 +319,6 @@
 		};
 	};
 
-	uart1_pins: uart1-pins {
-		mux {
-			function = "uart";
-			groups = "uart1";
-		};
-	};
-
-	uart2_pins: uart2-pins {
-		mux {
-			function = "uart";
-			groups = "uart2";
-		};
-	};
-
 	wf_2g_5g_pins: wf_2g_5g-pins {
 		mux {
 			function = "wifi";
@@ -392,22 +364,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pins>;
 	status = "okay";
-};
-
-&uart1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart1_pins>;
-	status = "disabled";
-
-	/* EFR32MG21 Zigbee (BOOT)*/
-};
-
-&uart2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&uart2_pins>;
-	status = "disabled";
-
-	/* EFR32MG21 Zigbee */
 };
 
 &usb_phy {
