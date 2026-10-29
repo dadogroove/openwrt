@@ -136,7 +136,7 @@
 +CONFIG_HEXDUMP=y
 --- /dev/null
 +++ b/arch/arm/dts/mt7986a-zyxel_ex5512-t0.dts
-@@ -0,0 +1,178 @@
+@@ -0,0 +1,165 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
 +/dts-v1/;
@@ -198,12 +198,6 @@
 +	status = "okay";
 +};
 +
-+&uart1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart1_pins>;
-+	status = "disabled";
-+};
-+
 +&eth {
 +	status = "okay";
 +	mediatek,gmac-id = <0>;
@@ -222,13 +216,6 @@
 +		mux {
 +			function = "spi";
 +			groups = "spi1_2";
-+		};
-+	};
-+
-+	uart1_pins: spi1-pins-func-3 {
-+		mux {
-+			function = "uart";
-+			groups = "uart1_2";
 +		};
 +	};
 +
