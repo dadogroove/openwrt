@@ -35,8 +35,6 @@
 
 #define RTL839X_PORT_ISO_CTRL(port)		(0x1400 + ((port) << 3))
 
-#define RTL839X_TBL_ACCESS_CTRL_2		(0x611C)
-
 #define RTL839X_MAC_LINK_STS			(0x0390)
 
 #define RTL839X_EEE_TX_TIMER_GELITE_CTRL	(0x042C)
@@ -88,17 +86,6 @@ void rtldsa_839x_print_matrix(struct otto_dsa_priv *priv)
 static inline int rtl839x_port_iso_ctrl(int p)
 {
 	return RTL839X_PORT_ISO_CTRL(p);
-}
-
-void rtl839x_exec_tbl2_cmd(struct otto_dsa_priv *priv, u32 cmd)
-{
-	u32 val;
-
-	if (regmap_write(priv->map, RTL839X_TBL_ACCESS_CTRL_2, cmd))
-		return;
-
-	regmap_read_poll_timeout(priv->map, RTL839X_TBL_ACCESS_CTRL_2,
-				val, !(val & BIT(9)), 0, 0);
 }
 
 static inline int rtl839x_mac_force_mode_ctrl(int p)
@@ -227,7 +214,7 @@ static void rtl839x_set_receive_management_action(struct otto_dsa_priv *priv,
 const struct rtldsa_config rtldsa_839x_cfg = {
 	.switch_ops = &rtldsa_83xx_switch_ops,
 	.phylink_mac_ops = &rtldsa_83xx_phylink_mac_ops,
-	.stp_init = rtldsa_839x_stp_init,
+	.stp_init = otto_stp_839x_init,
 	.l2_bucket_size = 4,
 	.n_mst = 256,
 	.num_lag_ids = 16,
@@ -288,8 +275,8 @@ const struct rtldsa_config rtldsa_839x_cfg = {
 	.enable_mcast_flood = otto_l2_839x_enable_mcast_flood,
 	.enable_bcast_flood = otto_l2_839x_enable_bcast_flood,
 	.set_static_move_action = otto_l2_839x_set_static_move_action,
-	.stp_get = rtldsa_839x_stp_get,
-	.stp_set = rtl839x_stp_set,
+	.stp_get = otto_stp_839x_get,
+	.stp_set = otto_stp_839x_set,
 	.mac_force_mode = {
 		.force_en_mask = RTL83XX_FORCE_EN,
 		.link_up_mask = RTL83XX_FORCE_LINK_EN,
