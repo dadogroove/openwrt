@@ -161,6 +161,25 @@ endef
 $(eval $(call KernelPackage,can-mcp251x))
 
 
+define KernelPackage/can-mcp251xfd
+  TITLE:=MCP251xFD SPI CAN FD controller
+  KCONFIG:=\
+	CONFIG_SPI=y \
+	CONFIG_CAN_MCP251XFD \
+	CONFIG_CAN_MCP251XFD_SANITY=n
+  FILES:=$(LINUX_DIR)/drivers/net/can/spi/mcp251xfd/mcp251xfd.ko
+  AUTOLOAD:=$(call AutoProbe,mcp251xfd)
+  DEPENDS:=+kmod-regmap-core
+  $(call AddDepends/can)
+endef
+
+define KernelPackage/can-mcp251xfd/description
+ Microchip MCP2517FD, MCP2518FD and MCP251863 SPI CAN FD controllers
+endef
+
+$(eval $(call KernelPackage,can-mcp251xfd))
+
+
 define KernelPackage/can-raw
   TITLE:=Raw CAN Protcol
   KCONFIG:=CONFIG_CAN_RAW
@@ -308,6 +327,22 @@ define KernelPackage/can-vcan/description
 endef
 
 $(eval $(call KernelPackage,can-vcan))
+
+
+define KernelPackage/can-vxcan
+  TITLE:=Virtual CAN Tunnel (vxcan)
+  KCONFIG:=CONFIG_CAN_VXCAN
+  FILES:=$(LINUX_DIR)/drivers/net/can/vxcan.ko
+  AUTOLOAD:=$(call AutoProbe,vxcan)
+  $(call AddDepends/can)
+endef
+
+define KernelPackage/can-vxcan/description
+ Similar to the virtual ethernet driver veth, vxcan implements a
+ local CAN traffic tunnel between two virtual CAN network devices.
+endef
+
+$(eval $(call KernelPackage,can-vxcan))
 
 define KernelPackage/can-xilinx-can
   TITLE:=Xilinx CAN IP
