@@ -185,7 +185,7 @@
 				read-only;
 			};
 
-			partition@f0000 {
+			partition@180000 {
 				compatible = "denx,fit";
 				label = "firmware";
 				reg = <0x180000 0xe00000>;
