@@ -115,7 +115,7 @@
 +CONFIG_HEXDUMP=y
 --- /dev/null
 +++ b/arch/arm/dts/mt7981_xiaomi_mi-router-ax3000t.dts
-@@ -0,0 +1,187 @@
+@@ -0,0 +1,172 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (c) 2022 MediaTek Inc.
@@ -278,23 +278,8 @@
 +			};
 +
 +			partition@580000 {
-+				label = "crash";
-+				reg = <0x580000 0x40000>;
-+			};
-+
-+			partition@5c0000 {
-+				label = "crash_log";
-+				reg = <0x5c0000 0x40000>;
-+			};
-+
-+			partition@600000 {
 +				label = "ubi";
-+				reg = <0x600000 0x7000000>;
-+			};
-+
-+			partition@7600000 {
-+				label = "KF";
-+				reg = <0x7600000 0x40000>;
++				reg = <0x580000 0x7a80000>;
 +			};
 +		};
 +	};
