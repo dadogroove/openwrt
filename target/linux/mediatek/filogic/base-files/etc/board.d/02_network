@@ -18,6 +18,8 @@ mediatek_setup_interfaces()
 	nokia,ea0326gmp|\
 	mercusys,mr80x-v3|\
 	routerich,ax3000-v1|\
+	xiaomi,mi-router-ax3000t|\
+	xiaomi,mi-router-ax3000t-ubootmod|\
 	zbtlink,zbt-z8103ax|\
 	zbtlink,zbt-z8103ax-c)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" eth1
@@ -84,6 +86,9 @@ mediatek_setup_interfaces()
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" wan
 		;;
 	asus,tuf-ax4200|\
+	comfast,cf-wr633ax|\
+	comfast,cf-wr633ax-ubi|\
+	comfast,cf-wr633ax-ubootmod|\
 	iptime,ax3000sm|\
 	iptime,ax7800m-6e|\
 	jdcloud,re-cp-03|\
@@ -97,7 +102,9 @@ mediatek_setup_interfaces()
 	wavlink,wl-wn536ax6-a|\
 	zbtlink,zbt-z8102ax|\
 	zbtlink,zbt-z8102ax-v2|\
-	zbtlink,zbt-z8106ax-s)
+	zbtlink,zbt-z8106ax-s|\
+	zyxel,ex5512-t0|\
+    zyxel,ex5512-t0-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "eth1"
 		;;
 	zbtlink,zbt-z8105ax-c)
@@ -251,8 +258,12 @@ mediatek_setup_interfaces()
 		ucidef_set_interfaces_lan_wan "lan1 lan2 eth1" eth2
 		;;
 	tplink,tl-xdr6086|\
+	wavlink,wl-wn551x1b|\
+	wavlink,wl-wn551x1b-ubi|\
+	wavlink,wl-wn551x1b-ubootmod|\
 	wavlink,wl-wn551x3|\
 	wavlink,wl-wn586x3|\
+	wavlink,wl-wn586x3-no-hw|\
 	wavlink,wl-wn586x3b)
 		ucidef_set_interfaces_lan_wan "lan1 lan2" eth1
 		;;
@@ -267,8 +278,6 @@ mediatek_setup_interfaces()
 	tplink,re6000xd)
 		ucidef_set_interface_lan "lan1 lan2 eth1"
 		;;
-	xiaomi,mi-router-ax3000t|\
-	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,mi-router-wr30u-stock|\
 	xiaomi,mi-router-wr30u-ubootmod|\
 	xiaomi,redmi-router-ax6000-stock|\

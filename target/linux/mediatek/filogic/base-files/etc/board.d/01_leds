@@ -420,12 +420,16 @@ tplink,re6000xd)
 wavlink,wl-wn536ax6-a)
 	ucidef_set_led_netdev "wan" "wan" "blue:wan" "eth1" "link tx rx"
 	;;
+wavlink,wl-wn551x1b|\
+wavlink,wl-wn551x1b-ubi|\
+wavlink,wl-wn551x1b-ubootmod|\
 wavlink,wl-wn551x3)
         ucidef_set_led_netdev "lan-1" "lan-1" "green:lan-1" "lan1" "link tx rx"
         ucidef_set_led_netdev "lan-2" "lan-2" "green:lan-2" "lan2" "link tx rx"
         ucidef_set_led_netdev "wan" "wan" "green:wan" "eth1" "link tx rx"
         ;;
 wavlink,wl-wn586x3|\
+wavlink,wl-wn586x3-no-hw|\
 wavlink,wl-wn586x3b)
 	ucidef_set_led_netdev "lan-1" "lan-1" "blue:lan-1" "lan1" "link tx rx"
 	ucidef_set_led_netdev "lan-2" "lan-2" "blue:lan-2" "lan2" "link tx rx"
@@ -449,6 +453,13 @@ zbtlink,zbt-z8106ax-s|\
 zbtlink,zbt-z8106ax-t)
 	ucidef_set_led_netdev "wan" "wan" "amber:wan" "eth1" "link tx rx"
 	ucidef_set_led_netdev "mobile" "mobile" "green:mobile" "wwan" "link tx rx"
+	;;
+zyxel,ex5512-t0|\
+zyxel,ex5512-t0-ubootmod)
+	ucidef_set_led_netdev "lan" "LAN" "green:lan" "eth0" "link tx rx"
+	ucidef_set_led_netdev "internet" "INTERNET" "green:inet" "eth1" "link tx rx"
+	ucidef_set_led_netdev "wifi-24g" "WIFI-2.4G" "green:wifi24g" "phy0-ap0" "link tx rx"
+	ucidef_set_led_netdev "wifi-5g" "WIFI-5G" "green:wifi5g" "phy1-ap0" "link tx rx"
 	;;
 zyxel,ex5601-t0-stock|\
 zyxel,ex5601-t0-ubootmod)
