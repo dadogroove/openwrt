@@ -238,6 +238,7 @@ platform_do_upgrade() {
 	acer,vero-w6m|\
 	airpi,ap3000m|\
 	arcadyan,mozart|\
+	benton,sn-r1|\
 	glinet,gl-be14000|\
 	glinet,gl-mt2500|\
 	glinet,gl-mt2500-airoha|\
@@ -494,6 +495,7 @@ platform_check_image() {
 		fit_check_image "$1"
 		return $?
 		;;
+	benton,sn-r1|\
 	creatlentem,clt-r30b1|\
 	creatlentem,clt-r30b1-112m|\
 	hiveton,h5000m|\
@@ -539,6 +541,7 @@ platform_copy_config() {
 	acer,vero-w6m|\
 	airpi,ap3000m|\
 	arcadyan,mozart|\
+	benton,sn-r1|\
 	glinet,gl-be14000|\
 	glinet,gl-mt2500|\
 	glinet,gl-mt2500-airoha|\
