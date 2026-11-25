@@ -577,6 +577,11 @@ define U-Boot/mt7981_keenetic_kn-1012
   NAME:=Keenetic KN-1012 (chainload)
   BUILD_SUBTARGET:=filogic
   BUILD_DEVICES:=keenetic_kn-1012 netcraze_nc-1012
+  DEFAULT:=y if (TARGET_mediatek_filogic_Default || IB \
+	|| TARGET_mediatek_filogic_DEVICE_keenetic_kn-1012 \
+	|| TARGET_mediatek_filogic_DEVICE_netcraze_nc-1012 \
+	|| TARGET_DEVICE_mediatek_filogic_DEVICE_keenetic_kn-1012 \
+	|| TARGET_DEVICE_mediatek_filogic_DEVICE_netcraze_nc-1012)
   UBOOT_CONFIG:=mt7981_keenetic_kn-1012
   UBOOT_IMAGE:=u-boot.bin
 endef
@@ -989,6 +994,18 @@ define U-Boot/mt7986_jdcloud_re-cp-03
   BL2_SOC:=mt7986
   BL2_DDRTYPE:=ddr4
   DEPENDS:=+trusted-firmware-a-mt7986-emmc-ddr4
+endef
+
+define U-Boot/mt7986_mercusys_h90x-v1
+  NAME:=MERCUSYS Halo H90X v1
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=mercusys_h90x-v1-ubi
+  UBOOT_CONFIG:=mt7986_mercusys_h90x-v1
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand-ubi
+  BL2_SOC:=mt7986
+  BL2_DDRTYPE:=ddr3
+  DEPENDS:=+trusted-firmware-a-mt7986-spim-nand-ubi-ddr3
 endef
 
 define U-Boot/mt7986_mercusys_mr90x-v1
@@ -1591,6 +1608,7 @@ UBOOT_TARGETS := \
 	mt7986_bananapi_bpi-r3-mini-snand \
 	mt7986_glinet_gl-mt6000 \
 	mt7986_jdcloud_re-cp-03 \
+	mt7986_mercusys_h90x-v1 \
 	mt7986_mercusys_mr90x-v1 \
 	mt7986_netcore_n60 \
 	mt7986_netcore_n60-pro \
