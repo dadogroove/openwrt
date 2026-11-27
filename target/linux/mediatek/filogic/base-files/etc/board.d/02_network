@@ -84,6 +84,9 @@ mediatek_setup_interfaces()
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" wan
 		;;
 	asus,tuf-ax4200|\
+	comfast,cf-wr633ax|\
+	comfast,cf-wr633ax-ubi|\
+	comfast,cf-wr633ax-ubootmod|\
 	iptime,ax3000sm|\
 	iptime,ax7800m-6e|\
 	jdcloud,re-cp-03|\
@@ -98,7 +101,9 @@ mediatek_setup_interfaces()
 	wavlink,wl-wn536ax6-a|\
 	zbtlink,zbt-z8102ax|\
 	zbtlink,zbt-z8102ax-v2|\
-	zbtlink,zbt-z8106ax-s)
+	zbtlink,zbt-z8106ax-s|\
+	zyxel,ex5512-t0|\
+    zyxel,ex5512-t0-ubootmod)
 		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "eth1"
 		;;
 	zbtlink,zbt-z8105ax-c)
@@ -258,6 +263,9 @@ mediatek_setup_interfaces()
 	mercusys,h90x-v1|\
 	mercusys,h90x-v1-ubi|\
 	tplink,tl-xdr6086|\
+	wavlink,wl-wn551x1b|\
+	wavlink,wl-wn551x1b-ubi|\
+	wavlink,wl-wn551x1b-ubootmod|\
 	wavlink,wl-wn551x3|\
 	wavlink,wl-wn586x3|\
 	wavlink,wl-wn586x3b)
