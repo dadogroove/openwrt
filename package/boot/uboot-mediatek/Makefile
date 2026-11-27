@@ -370,6 +370,30 @@ define U-Boot/mt7981_comfast_cf-wr632ax-ubi
   DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ubi-ddr3-1866
 endef
 
+define U-Boot/mt7981_comfast_cf-wr633ax
+  NAME:=COMFAST CF-WR633AX
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=comfast_cf-wr633ax-ubootmod
+  UBOOT_CONFIG:=mt7981_comfast_cf-wr633ax
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr3-1866
+  DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ddr3-1866
+endef
+
+define U-Boot/mt7981_comfast_cf-wr633ax-ubi
+  NAME:=COMFAST CF-WR633AX (UBI)
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=comfast_cf-wr633ax-ubi
+  UBOOT_CONFIG:=mt7981_comfast_cf-wr633ax-ubi
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand-ubi
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr3-1866
+  DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ubi-ddr3-1866
+endef
+
 define U-Boot/mt7981_creatlentem_clt-r30b1-ubi
   NAME:=CreatLentem CLT-R30B1 (UBI)
   BUILD_SUBTARGET:=filogic
@@ -827,6 +851,30 @@ define U-Boot/mt7981_teralink_tl3020-256mb
   DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ddr3-1866
 endef
 
+define U-Boot/mt7981_wavlink_wl-wn551x1b
+  NAME:=WAVLINK WL-WN551X1B
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=wavlink_wl-wn551x1b-ubootmod
+  UBOOT_CONFIG:=mt7981_wavlink_wl-wn551x1b
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr3-1866
+  DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ddr3-1866
+endef
+
+define U-Boot/mt7981_wavlink_wl-wn551x1b-ubi
+  NAME:=WAVLINK WL-WN551X1B (UBI)
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=wavlink_wl-wn551x1b-ubi
+  UBOOT_CONFIG:=mt7981_wavlink_wl-wn551x1b-ubi
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand-ubi
+  BL2_SOC:=mt7981
+  BL2_DDRTYPE:=ddr3-1866
+  DEPENDS:=+trusted-firmware-a-mt7981-spim-nand-ubi-ddr3-1866
+endef
+
 define U-Boot/mt7981_wavlink_wl-wnt100x3
   NAME:=WAVLINK WL-WNT100X3
   BUILD_SUBTARGET:=filogic
@@ -1102,6 +1150,18 @@ define U-Boot/mt7986_xiaomi_redmi-router-ax6000
   BL2_SOC:=mt7986
   BL2_DDRTYPE:=ddr4
   DEPENDS:=+trusted-firmware-a-mt7986-spim-nand-ddr4
+endef
+
+define U-Boot/mt7986_zyxel_ex5512-t0
+  NAME:=Zyxel EX5512-T0
+  BUILD_SUBTARGET:=filogic
+  BUILD_DEVICES:=zyxel_ex5512-t0-ubootmod
+  UBOOT_CONFIG:=mt7986_zyxel_ex5512-t0
+  UBOOT_IMAGE:=u-boot.fip
+  BL2_BOOTDEV:=spim-nand-4k
+  BL2_SOC:=mt7986
+  BL2_DDRTYPE:=ddr4
+  DEPENDS:=+trusted-firmware-a-mt7986-spim-nand-4k-ddr4
 endef
 
 define U-Boot/mt7986_zyxel_ex5601-t0
