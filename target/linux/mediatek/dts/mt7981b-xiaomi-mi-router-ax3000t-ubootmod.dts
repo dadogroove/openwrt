@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 
 /dts-v1/;
-#include "mt7981b-xiaomi-mi-router-ax3000t.dtsi"
+#include "mt7981b-xiaomi-mi-router-ax3000t-common.dtsi"
 
 / {
 	model = "Xiaomi Mi Router AX3000T (OpenWrt U-Boot layout)";
@@ -14,9 +14,9 @@
 };
 
 &partitions {
-	partition@600000 {
+	partition@580000 {
 		label = "ubi";
-		reg = <0x600000 0x7000000>;
+		reg = <0x580000 0x7a80000>;
 				compatible = "linux,ubi";
 
 				volumes {
