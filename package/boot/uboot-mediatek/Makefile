@@ -1617,6 +1617,8 @@ UBOOT_TARGETS := \
 	mt7981_comfast_cf-wa933-ubi \
 	mt7981_comfast_cf-wr632ax \
 	mt7981_comfast_cf-wr632ax-ubi \
+	mt7981_comfast_cf-wr633ax \
+	mt7981_comfast_cf-wr633ax-ubi \
 	mt7981_creatlentem_clt-r30b1-ubi \
 	mt7981_cudy_m3000-v1 \
 	mt7981_cudy_m3000-v2-yt8821 \
@@ -1656,6 +1658,8 @@ UBOOT_TARGETS := \
 	mt7981_snr_snr-cpe-ax2 \
 	mt7981_teralink_tl3020-256mb \
 	mt7981_wavlink_wl-wnt100x3 \
+	mt7981_wavlink_wl-wn551x1b \
+	mt7981_wavlink_wl-wn551x1b-ubi \
 	mt7981_xiaomi_mi-router-ax3000t \
 	mt7981_xiaomi_mi-router-wr30u \
 	mt7986_acer_predator-w6x \
@@ -1677,6 +1681,7 @@ UBOOT_TARGETS := \
 	mt7986_tplink_tl-xdr6088 \
 	mt7986_tplink_tl-xtr8488 \
 	mt7986_xiaomi_redmi-router-ax6000 \
+	mt7986_zyxel_ex5512-t0 \
 	mt7986_zyxel_ex5601-t0 \
 	mt7986_zyxel_wx5600-t0 \
 	mt7986_rfb \
