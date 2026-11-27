@@ -177,6 +177,8 @@ platform_do_upgrade() {
 	comfast,cf-wa933-ubi|\
 	comfast,cf-wr632ax-ubi|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubi|\
+	comfast,cf-wr633ax-ubootmod|\
 	creatlentem,clt-r30b1-ubi|\
 	cudy,m3000-v1-ubootmod|\
 	cudy,m3000-v2-yt8821-ubootmod|\
@@ -221,10 +223,13 @@ platform_do_upgrade() {
 	tplink,tl-xdr6086|\
 	tplink,tl-xdr6088|\
 	tplink,tl-xtr8488|\
+	wavlink,wl-wn551x1b-ubi|\
+	wavlink,wl-wn551x1b-ubootmod|\
 	wavlink,wl-wnt100x3-ubootmod|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,redmi-router-ax6000-ubootmod|\
 	xiaomi,mi-router-wr30u-ubootmod|\
+	zyxel,ex5512-t0-ubootmod|\
 	zyxel,ex5601-t0-ubootmod|\
 	zyxel,wx5600-t0-ubootmod)
 		fit_do_upgrade "$1"
@@ -441,6 +446,8 @@ platform_check_image() {
 	comfast,cf-wa933-ubi|\
 	comfast,cf-wr632ax-ubi|\
 	comfast,cf-wr632ax-ubootmod|\
+	comfast,cf-wr633ax-ubi|\
+	comfast,cf-wr633ax-ubootmod|\
 	creatlentem,clt-r30b1-ubi|\
 	cudy,m3000-v1-ubootmod|\
 	cudy,m3000-v2-yt8821-ubootmod|\
@@ -479,10 +486,13 @@ platform_check_image() {
 	tplink,tl-xdr6086|\
 	tplink,tl-xdr6088|\
 	tplink,tl-xtr8488|\
+	wavlink,wl-wn551x1b-ubi|\
+	wavlink,wl-wn551x1b-ubootmod|\
 	wavlink,wl-wnt100x3-ubootmod|\
 	xiaomi,mi-router-ax3000t-ubootmod|\
 	xiaomi,redmi-router-ax6000-ubootmod|\
 	xiaomi,mi-router-wr30u-ubootmod|\
+	zyxel,ex5512-t0-ubootmod|\
 	zyxel,ex5601-t0-ubootmod)
 		fit_check_image "$1"
 		return $?
